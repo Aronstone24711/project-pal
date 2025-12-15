@@ -152,6 +152,59 @@ Be extremely detailed with connection instructions. Use specific pin numbers and
           content: `Provide detailed build instructions for this project: ${projectId}. Available components: ${JSON.stringify(components)}`
         }
       ];
+    } else if (action === 'fix_code') {
+      // Fix code based on user's problem description
+      const { currentCode, problemDescription, deviceType, language: lang = 'en' } = await req.json();
+      
+      const languageInstruction = lang !== 'en' 
+        ? `IMPORTANT: Respond with all text content (analysis, explanation, tips) in ${lang} language. Keep code and technical terms in English.` 
+        : '';
+      
+      messages = [
+        {
+          role: "system",
+          content: `You are an expert embedded systems programmer specializing in Arduino, Raspberry Pi, ESP32, ESP8266, and other microcontrollers. A user is having issues with their code and needs help fixing it.
+${languageInstruction}
+Analyze the problem, identify the issue, and provide a corrected version of the code.
+
+Return a JSON response with this exact structure:
+{
+  "analysis": {
+    "problemIdentified": "Clear description of what's wrong",
+    "cause": "Why this problem occurs",
+    "deviceCompatibility": "Notes about device-specific issues if any"
+  },
+  "fixedCode": {
+    "filename": "fixed_project.ino",
+    "code": "// The complete corrected code here",
+    "changes": ["List of specific changes made to fix the code"]
+  },
+  "explanation": "Detailed explanation of what was fixed and why",
+  "tips": ["Additional tips to prevent similar issues"],
+  "deviceNotes": "Any specific notes for the target device (${deviceType})"
+}
+
+Be thorough in your analysis. Consider:
+- Pin compatibility for the specific device
+- Library compatibility
+- Voltage level differences
+- Memory constraints
+- Timing issues
+- Common beginner mistakes`
+        },
+        {
+          role: "user",
+          content: `I'm using a ${deviceType}. Here's my current code:
+
+\`\`\`
+${currentCode}
+\`\`\`
+
+My problem: ${problemDescription}
+
+Please analyze and fix the code.`
+        }
+      ];
     }
 
     console.log(`Processing ${action} request...`);

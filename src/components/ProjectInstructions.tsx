@@ -21,6 +21,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Component, Project, ProjectInstructions as ProjectInstructionsType, InstructionStep } from "@/types/arduino";
+import CodeFixDialog from "./CodeFixDialog";
 
 interface ProjectInstructionsProps {
   project: Project;
@@ -35,6 +36,7 @@ const ProjectInstructions = ({ project, components, onBack, language }: ProjectI
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
   const [currentStep, setCurrentStep] = useState(0);
   const [copied, setCopied] = useState(false);
+  const [currentCode, setCurrentCode] = useState<string>("");
   const { toast } = useToast();
 
   useEffect(() => {
@@ -57,6 +59,7 @@ const ProjectInstructions = ({ project, components, onBack, language }: ProjectI
 
       if (data.project) {
         setInstructions(data);
+        setCurrentCode(data.project.code?.code || "");
       }
     } catch (error: any) {
       toast({
@@ -82,13 +85,29 @@ const ProjectInstructions = ({ project, components, onBack, language }: ProjectI
   };
 
   const copyCode = async () => {
-    if (instructions?.project.code.code) {
-      await navigator.clipboard.writeText(instructions.project.code.code);
+    if (currentCode) {
+      await navigator.clipboard.writeText(currentCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
       toast({
         title: "Code Copied!",
         description: "Paste it into your Arduino IDE."
+      });
+    }
+  };
+
+  const handleCodeFixed = (newCode: string) => {
+    setCurrentCode(newCode);
+    if (instructions) {
+      setInstructions({
+        ...instructions,
+        project: {
+          ...instructions.project,
+          code: {
+            ...instructions.project.code,
+            code: newCode
+          }
+        }
       });
     }
   };
@@ -215,21 +234,28 @@ const ProjectInstructions = ({ project, components, onBack, language }: ProjectI
         <TabsContent value="code">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-2">
                 <CardTitle className="flex items-center gap-2">
                   <Code className="w-5 h-5" />
                   {proj.code?.filename || "project.ino"}
                 </CardTitle>
-                <Button variant="outline" size="sm" onClick={copyCode} className="gap-2">
-                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
-                  {copied ? "Copied!" : "Copy Code"}
-                </Button>
+                <div className="flex items-center gap-2">
+                  <CodeFixDialog 
+                    currentCode={currentCode} 
+                    language={language}
+                    onCodeFixed={handleCodeFixed}
+                  />
+                  <Button variant="outline" size="sm" onClick={copyCode} className="gap-2">
+                    {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                    {copied ? "Copied!" : "Copy Code"}
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-96">
                 <pre className="text-sm bg-muted p-4 rounded-lg overflow-x-auto">
-                  <code>{proj.code?.code || "// Code will be generated here"}</code>
+                  <code>{currentCode || "// Code will be generated here"}</code>
                 </pre>
               </ScrollArea>
               {proj.code?.explanation && (
