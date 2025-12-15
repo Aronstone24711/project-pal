@@ -1,19 +1,32 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import LanguageSelector from "@/components/LanguageSelector";
 import CameraScanner from "@/components/CameraScanner";
 import ComponentsList from "@/components/ComponentsList";
 import ProjectSuggestions from "@/components/ProjectSuggestions";
 import ProjectInstructions from "@/components/ProjectInstructions";
 import { Component, Project } from "@/types/arduino";
 
-type AppState = "scan" | "components" | "projects" | "instructions";
+interface Language {
+  code: string;
+  name: string;
+  nativeName: string;
+  flag: string;
+}
+
+type AppState = "language" | "scan" | "components" | "projects" | "instructions";
 
 const Index = () => {
-  const [state, setState] = useState<AppState>("scan");
+  const [state, setState] = useState<AppState>("language");
+  const [language, setLanguage] = useState<Language | null>(null);
   const [components, setComponents] = useState<Component[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
+  const handleLanguageSelect = (selectedLanguage: Language) => {
+    setLanguage(selectedLanguage);
+    setState("scan");
+  };
   const handleComponentsIdentified = (identifiedComponents: Component[]) => {
     setComponents(identifiedComponents);
     setState("components");
@@ -35,6 +48,8 @@ const Index = () => {
       setState("components");
     } else if (state === "components") {
       setState("scan");
+    } else if (state === "scan") {
+      setState("language");
     }
   };
 
@@ -42,7 +57,7 @@ const Index = () => {
     setComponents([]);
     setProjects([]);
     setSelectedProject(null);
-    setState("scan");
+    setState("language");
   };
 
   return (
@@ -67,20 +82,31 @@ const Index = () => {
               </div>
             </div>
             
-            {state !== "scan" && (
-              <button
-                onClick={handleReset}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
-                Start Over
-              </button>
+            {state !== "language" && (
+              <div className="flex items-center gap-4">
+                {language && (
+                  <span className="text-sm text-muted-foreground">
+                    {language.flag} {language.name}
+                  </span>
+                )}
+                <button
+                  onClick={handleReset}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Start Over
+                </button>
+              </div>
             )}
           </div>
         </header>
 
         <main className="container mx-auto px-4 py-6">
+          {state === "language" && (
+            <LanguageSelector onLanguageSelect={handleLanguageSelect} />
+          )}
+          
           {state === "scan" && (
-            <CameraScanner onComponentsIdentified={handleComponentsIdentified} />
+            <CameraScanner onComponentsIdentified={handleComponentsIdentified} language={language?.code || "en"} />
           )}
           
           {state === "components" && (
@@ -98,6 +124,7 @@ const Index = () => {
               setProjects={setProjects}
               onProjectSelect={handleProjectSelect}
               onBack={handleBack}
+              language={language?.code || "en"}
             />
           )}
           
@@ -106,6 +133,7 @@ const Index = () => {
               project={selectedProject}
               components={components}
               onBack={handleBack}
+              language={language?.code || "en"}
             />
           )}
         </main>

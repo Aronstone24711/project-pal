@@ -26,9 +26,10 @@ interface ProjectInstructionsProps {
   project: Project;
   components: Component[];
   onBack: () => void;
+  language: string;
 }
 
-const ProjectInstructions = ({ project, components, onBack }: ProjectInstructionsProps) => {
+const ProjectInstructions = ({ project, components, onBack, language }: ProjectInstructionsProps) => {
   const [instructions, setInstructions] = useState<ProjectInstructionsType | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set());
@@ -47,7 +48,8 @@ const ProjectInstructions = ({ project, components, onBack }: ProjectInstruction
         body: { 
           action: "get_instructions",
           projectId: `${project.name} - ${project.description}`,
-          components: components.map(c => ({ name: c.name, type: c.type, quantity: c.quantity }))
+          components: components.map(c => ({ name: c.name, type: c.type, quantity: c.quantity })),
+          language
         }
       });
 

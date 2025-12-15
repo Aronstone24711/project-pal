@@ -8,9 +8,10 @@ import { Component } from "@/types/arduino";
 
 interface CameraScannerProps {
   onComponentsIdentified: (components: Component[]) => void;
+  language: string;
 }
 
-const CameraScanner = ({ onComponentsIdentified }: CameraScannerProps) => {
+const CameraScanner = ({ onComponentsIdentified, language }: CameraScannerProps) => {
   const [mode, setMode] = useState<"select" | "camera" | "upload">("select");
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
