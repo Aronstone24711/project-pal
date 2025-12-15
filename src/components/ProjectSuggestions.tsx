@@ -13,6 +13,7 @@ interface ProjectSuggestionsProps {
   setProjects: (projects: Project[]) => void;
   onProjectSelect: (project: Project) => void;
   onBack: () => void;
+  language: string;
 }
 
 const difficultyColors = {
@@ -26,7 +27,8 @@ const ProjectSuggestions = ({
   projects, 
   setProjects, 
   onProjectSelect, 
-  onBack 
+  onBack,
+  language 
 }: ProjectSuggestionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -43,7 +45,8 @@ const ProjectSuggestions = ({
       const { data, error } = await supabase.functions.invoke("analyze-components", {
         body: { 
           action: "suggest_projects",
-          components: components.map(c => ({ name: c.name, type: c.type, quantity: c.quantity }))
+          components: components.map(c => ({ name: c.name, type: c.type, quantity: c.quantity })),
+          language
         }
       });
 

@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, action, projectId, components } = await req.json();
+    const { imageBase64, action, projectId, components, language = 'en' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -60,11 +60,15 @@ Be thorough and identify every component you can see including wires, resistors,
       ];
     } else if (action === 'suggest_projects') {
       // Suggest projects based on identified components
+      const languageInstruction = language !== 'en' 
+        ? `IMPORTANT: Respond with all text content (name, description, tags) in ${language} language.` 
+        : '';
+      
       messages = [
         {
           role: "system",
           content: `You are an Arduino project expert. Based on the components provided, suggest creative and educational projects that can be built.
-
+${languageInstruction}
 Return a JSON response with this exact structure:
 {
   "projects": [
@@ -89,11 +93,15 @@ Suggest 5-8 diverse projects ranging from simple to complex.`
       ];
     } else if (action === 'get_instructions') {
       // Get detailed instructions for a specific project
+      const languageInstruction = language !== 'en' 
+        ? `IMPORTANT: Respond with all text content (name, overview, descriptions, tips, explanations, testing steps, troubleshooting) in ${language} language. Keep technical terms like pin names and code in English.` 
+        : '';
+      
       messages = [
         {
           role: "system",
           content: `You are an Arduino project instructor. Provide detailed, step-by-step instructions for building the project with visual descriptions.
-
+${languageInstruction}
 Return a JSON response with this exact structure:
 {
   "project": {
