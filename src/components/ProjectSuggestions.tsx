@@ -6,6 +6,7 @@ import { ArrowLeft, Clock, Loader2, Sparkles, ChevronRight } from "lucide-react"
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Component, Project } from "@/types/arduino";
+import { EnglishLevel } from "./EnglishLevelSelector";
 
 interface ProjectSuggestionsProps {
   components: Component[];
@@ -14,6 +15,7 @@ interface ProjectSuggestionsProps {
   onProjectSelect: (project: Project) => void;
   onBack: () => void;
   language: string;
+  englishLevel: EnglishLevel;
 }
 
 const difficultyColors = {
@@ -28,7 +30,8 @@ const ProjectSuggestions = ({
   setProjects, 
   onProjectSelect, 
   onBack,
-  language 
+  language,
+  englishLevel
 }: ProjectSuggestionsProps) => {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
@@ -46,7 +49,8 @@ const ProjectSuggestions = ({
         body: { 
           action: "suggest_projects",
           components: components.map(c => ({ name: c.name, type: c.type, quantity: c.quantity })),
-          language
+          language,
+          englishLevel
         }
       });
 

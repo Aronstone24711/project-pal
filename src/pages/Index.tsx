@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Helmet } from "react-helmet";
 import WelcomePage from "@/components/WelcomePage";
 import LanguageSelector from "@/components/LanguageSelector";
+import AgeSelector from "@/components/AgeSelector";
+import EnglishLevelSelector, { EnglishLevel } from "@/components/EnglishLevelSelector";
 import CameraScanner from "@/components/CameraScanner";
 import ComponentsList from "@/components/ComponentsList";
 import ProjectSuggestions from "@/components/ProjectSuggestions";
@@ -17,12 +19,15 @@ interface Language {
   flag: string;
 }
 
-type AppState = "welcome" | "language" | "scan" | "components" | "projects" | "instructions";
+type AppState = "welcome" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions";
 
 const Index = () => {
   const [state, setState] = useState<AppState>("welcome");
   const [isGuest, setIsGuest] = useState(false);
   const [language, setLanguage] = useState<Language | null>(null);
+  const [age, setAge] = useState<number | null>(null);
+  const [isChild, setIsChild] = useState(false);
+  const [englishLevel, setEnglishLevel] = useState<EnglishLevel>("easy");
   const [components, setComponents] = useState<Component[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
@@ -34,8 +39,27 @@ const Index = () => {
 
   const handleLanguageSelect = (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
+    setState("age");
+  };
+
+  const handleAgeSelect = (selectedAge: number, childStatus: boolean) => {
+    setAge(selectedAge);
+    setIsChild(childStatus);
+    if (childStatus) {
+      // Children get easy English automatically
+      setEnglishLevel("easy");
+      setState("scan");
+    } else {
+      // Adults choose their English level
+      setState("englishLevel");
+    }
+  };
+
+  const handleEnglishLevelSelect = (level: EnglishLevel) => {
+    setEnglishLevel(level);
     setState("scan");
   };
+
   const handleComponentsIdentified = (identifiedComponents: Component[]) => {
     setComponents(identifiedComponents);
     setState("components");
@@ -58,6 +82,14 @@ const Index = () => {
     } else if (state === "components") {
       setState("scan");
     } else if (state === "scan") {
+      if (isChild) {
+        setState("age");
+      } else {
+        setState("englishLevel");
+      }
+    } else if (state === "englishLevel") {
+      setState("age");
+    } else if (state === "age") {
       setState("language");
     } else if (state === "language") {
       setState("welcome");
@@ -69,6 +101,9 @@ const Index = () => {
     setProjects([]);
     setSelectedProject(null);
     setIsGuest(false);
+    setAge(null);
+    setIsChild(false);
+    setEnglishLevel("easy");
     setState("welcome");
   };
 
@@ -141,6 +176,14 @@ const Index = () => {
           {state === "language" && (
             <LanguageSelector onLanguageSelect={handleLanguageSelect} />
           )}
+
+          {state === "age" && (
+            <AgeSelector onAgeSelect={handleAgeSelect} />
+          )}
+
+          {state === "englishLevel" && (
+            <EnglishLevelSelector onLevelSelect={handleEnglishLevelSelect} />
+          )}
           
           {state === "scan" && (
             <CameraScanner onComponentsIdentified={handleComponentsIdentified} language={language?.code || "en"} />
@@ -162,6 +205,7 @@ const Index = () => {
               onProjectSelect={handleProjectSelect}
               onBack={handleBack}
               language={language?.code || "en"}
+              englishLevel={englishLevel}
             />
           )}
           
@@ -171,6 +215,7 @@ const Index = () => {
               components={components}
               onBack={handleBack}
               language={language?.code || "en"}
+              englishLevel={englishLevel}
             />
           )}
         </main>

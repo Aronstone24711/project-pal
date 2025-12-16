@@ -11,7 +11,7 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, action, projectId, components, language = 'en' } = await req.json();
+    const { imageBase64, action, projectId, components, language = 'en', englishLevel = 'medium' } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -64,11 +64,19 @@ Be thorough and identify every component you can see including wires, resistors,
         ? `IMPORTANT: Respond with all text content (name, description, tags) in ${language} language.` 
         : '';
       
+      const complexityInstruction = englishLevel === 'easy' 
+        ? 'Use very simple, short sentences. Avoid technical jargon. Write as if explaining to an 8-year-old child.'
+        : englishLevel === 'hard'
+        ? 'Use technical terminology and detailed explanations suitable for experienced makers and engineers.'
+        : 'Use clear, standard vocabulary with straightforward explanations.';
+      
       messages = [
         {
           role: "system",
           content: `You are an Arduino project expert. Based on the components provided, suggest creative and educational projects that can be built.
 ${languageInstruction}
+${complexityInstruction}
+
 Return a JSON response with this exact structure:
 {
   "projects": [
@@ -97,11 +105,19 @@ Suggest 5-8 diverse projects ranging from simple to complex.`
         ? `IMPORTANT: Respond with all text content (name, overview, descriptions, tips, explanations, testing steps, troubleshooting) in ${language} language. Keep technical terms like pin names and code in English.` 
         : '';
       
+      const complexityInstruction = englishLevel === 'easy' 
+        ? 'CRITICAL: Use very simple words and short sentences. Explain everything as if teaching an 8-year-old child. Avoid all technical jargon - use everyday words instead. For example, say "the long leg of the LED" instead of "the anode".'
+        : englishLevel === 'hard'
+        ? 'Use technical terminology freely. Include detailed explanations of why each step is necessary. Reference datasheets and technical specifications where relevant. Suitable for experienced engineers and makers.'
+        : 'Use clear, standard vocabulary. Explain technical terms when first used. Balance between accessibility and accuracy.';
+      
       messages = [
         {
           role: "system",
           content: `You are an Arduino project instructor. Provide detailed, step-by-step instructions for building the project with visual descriptions.
 ${languageInstruction}
+${complexityInstruction}
+
 Return a JSON response with this exact structure:
 {
   "project": {
