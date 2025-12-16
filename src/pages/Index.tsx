@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Helmet } from "react-helmet";
+import WelcomePage from "@/components/WelcomePage";
 import LanguageSelector from "@/components/LanguageSelector";
 import CameraScanner from "@/components/CameraScanner";
 import ComponentsList from "@/components/ComponentsList";
@@ -8,6 +9,7 @@ import ProjectInstructions from "@/components/ProjectInstructions";
 import HeaderMenu from "@/components/HeaderMenu";
 import { Component, Project } from "@/types/arduino";
 import { toast } from "sonner";
+
 interface Language {
   code: string;
   name: string;
@@ -15,14 +17,20 @@ interface Language {
   flag: string;
 }
 
-type AppState = "language" | "scan" | "components" | "projects" | "instructions";
+type AppState = "welcome" | "language" | "scan" | "components" | "projects" | "instructions";
 
 const Index = () => {
-  const [state, setState] = useState<AppState>("language");
+  const [state, setState] = useState<AppState>("welcome");
+  const [isGuest, setIsGuest] = useState(false);
   const [language, setLanguage] = useState<Language | null>(null);
   const [components, setComponents] = useState<Component[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+
+  const handleWelcomeContinue = (guest: boolean) => {
+    setIsGuest(guest);
+    setState("language");
+  };
 
   const handleLanguageSelect = (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
@@ -51,6 +59,8 @@ const Index = () => {
       setState("scan");
     } else if (state === "scan") {
       setState("language");
+    } else if (state === "language") {
+      setState("welcome");
     }
   };
 
@@ -58,7 +68,8 @@ const Index = () => {
     setComponents([]);
     setProjects([]);
     setSelectedProject(null);
-    setState("language");
+    setIsGuest(false);
+    setState("welcome");
   };
 
   const handleLoginClick = () => {
@@ -96,12 +107,12 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              {state !== "language" && language && (
+              {state !== "welcome" && state !== "language" && language && (
                 <span className="text-sm text-muted-foreground hidden sm:inline">
                   {language.flag} {language.name}
                 </span>
               )}
-              {state !== "language" && (
+              {state !== "welcome" && (
                 <button
                   onClick={handleReset}
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
@@ -119,6 +130,14 @@ const Index = () => {
         </header>
 
         <main className="container mx-auto px-4 py-6">
+          {state === "welcome" && (
+            <WelcomePage
+              onContinue={handleWelcomeContinue}
+              onLoginClick={handleLoginClick}
+              onSignupClick={handleSignupClick}
+            />
+          )}
+          
           {state === "language" && (
             <LanguageSelector onLanguageSelect={handleLanguageSelect} />
           )}
