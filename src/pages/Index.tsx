@@ -5,8 +5,9 @@ import CameraScanner from "@/components/CameraScanner";
 import ComponentsList from "@/components/ComponentsList";
 import ProjectSuggestions from "@/components/ProjectSuggestions";
 import ProjectInstructions from "@/components/ProjectInstructions";
+import HeaderMenu from "@/components/HeaderMenu";
 import { Component, Project } from "@/types/arduino";
-
+import { toast } from "sonner";
 interface Language {
   code: string;
   name: string;
@@ -60,6 +61,18 @@ const Index = () => {
     setState("language");
   };
 
+  const handleLoginClick = () => {
+    toast.info("Login feature coming soon!");
+  };
+
+  const handleSignupClick = () => {
+    toast.info("Sign up feature coming soon!");
+  };
+
+  const handleSettingsClick = () => {
+    toast.info("Settings feature coming soon!");
+  };
+
   return (
     <>
       <Helmet>
@@ -82,21 +95,26 @@ const Index = () => {
               </div>
             </div>
             
-            {state !== "language" && (
-              <div className="flex items-center gap-4">
-                {language && (
-                  <span className="text-sm text-muted-foreground">
-                    {language.flag} {language.name}
-                  </span>
-                )}
+            <div className="flex items-center gap-4">
+              {state !== "language" && language && (
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  {language.flag} {language.name}
+                </span>
+              )}
+              {state !== "language" && (
                 <button
                   onClick={handleReset}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
                 >
                   Start Over
                 </button>
-              </div>
-            )}
+              )}
+              <HeaderMenu
+                onLoginClick={handleLoginClick}
+                onSignupClick={handleSignupClick}
+                onSettingsClick={handleSettingsClick}
+              />
+            </div>
           </div>
         </header>
 
