@@ -9,6 +9,9 @@ import ComponentsList from "@/components/ComponentsList";
 import ProjectSuggestions from "@/components/ProjectSuggestions";
 import ProjectInstructions from "@/components/ProjectInstructions";
 import HeaderMenu from "@/components/HeaderMenu";
+import LocationSelector from "@/components/LocationSelector";
+import WeatherDisplay from "@/components/WeatherDisplay";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Component, Project } from "@/types/arduino";
 import { toast } from "sonner";
 
@@ -19,7 +22,7 @@ interface Language {
   flag: string;
 }
 
-type AppState = "welcome" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions";
+type AppState = "welcome" | "location" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions";
 
 const Index = () => {
   const [state, setState] = useState<AppState>("welcome");
@@ -31,9 +34,14 @@ const Index = () => {
   const [components, setComponents] = useState<Component[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const { weatherData } = useTheme();
 
   const handleWelcomeContinue = (guest: boolean) => {
     setIsGuest(guest);
+    setState("location");
+  };
+
+  const handleLocationSet = () => {
     setState("language");
   };
 
@@ -92,6 +100,8 @@ const Index = () => {
     } else if (state === "age") {
       setState("language");
     } else if (state === "language") {
+      setState("location");
+    } else if (state === "location") {
       setState("welcome");
     }
   };
@@ -126,11 +136,11 @@ const Index = () => {
         <meta name="description" content="Scan your Arduino and electronic components, get AI-powered project suggestions, and follow step-by-step visual instructions to build amazing projects." />
       </Helmet>
       
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background starry-bg">
         <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center sunny-glow">
                 <svg className="w-6 h-6 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
                 </svg>
@@ -142,7 +152,8 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-4">
-              {state !== "welcome" && state !== "language" && language && (
+              {weatherData && <WeatherDisplay />}
+              {state !== "welcome" && state !== "location" && state !== "language" && language && (
                 <span className="text-sm text-muted-foreground hidden sm:inline">
                   {language.flag} {language.name}
                 </span>
@@ -171,6 +182,10 @@ const Index = () => {
               onLoginClick={handleLoginClick}
               onSignupClick={handleSignupClick}
             />
+          )}
+
+          {state === "location" && (
+            <LocationSelector onLocationSet={handleLocationSet} />
           )}
           
           {state === "language" && (

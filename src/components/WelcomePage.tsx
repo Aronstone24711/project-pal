@@ -7,6 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { Phone, Mail } from "lucide-react";
+import PhoneAuthForm from "./PhoneAuthForm";
 
 interface WelcomePageProps {
   onContinue: (isGuest: boolean) => void;
@@ -14,22 +16,34 @@ interface WelcomePageProps {
   onSignupClick: () => void;
 }
 
+type AuthMode = "choice" | "phone" | "email";
+
 const WelcomePage = ({ onContinue, onLoginClick, onSignupClick }: WelcomePageProps) => {
   const [showLoginDialog, setShowLoginDialog] = useState(true);
+  const [authMode, setAuthMode] = useState<AuthMode>("choice");
 
   const handleGuestContinue = () => {
     setShowLoginDialog(false);
     onContinue(true);
   };
 
-  const handleLogin = () => {
+  const handleEmailLogin = () => {
     setShowLoginDialog(false);
     onLoginClick();
   };
 
-  const handleSignup = () => {
+  const handleEmailSignup = () => {
     setShowLoginDialog(false);
     onSignupClick();
+  };
+
+  const handlePhoneSuccess = () => {
+    setShowLoginDialog(false);
+    onContinue(false);
+  };
+
+  const resetAuthMode = () => {
+    setAuthMode("choice");
   };
 
   return (
@@ -56,34 +70,77 @@ const WelcomePage = ({ onContinue, onLoginClick, onSignupClick }: WelcomePagePro
         </div>
       </div>
 
-      <Dialog open={showLoginDialog} onOpenChange={setShowLoginDialog}>
+      <Dialog open={showLoginDialog} onOpenChange={(open) => {
+        setShowLoginDialog(open);
+        if (!open) resetAuthMode();
+      }}>
         <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-center text-2xl">Welcome!</DialogTitle>
-            <DialogDescription className="text-center">
-              Sign in to save your projects and preferences, or continue as a guest.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="flex flex-col gap-3 mt-4">
-            <Button onClick={handleLogin} className="w-full" size="lg">
-              Log In
-            </Button>
-            <Button onClick={handleSignup} variant="outline" className="w-full" size="lg">
-              Sign Up
-            </Button>
-            <div className="relative my-2">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-border" />
+          {authMode === "choice" && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-center text-2xl">Welcome!</DialogTitle>
+                <DialogDescription className="text-center">
+                  Sign in to save your projects and preferences, or continue as a guest.
+                </DialogDescription>
+              </DialogHeader>
+              
+              <div className="flex flex-col gap-3 mt-4">
+                <Button 
+                  onClick={() => setAuthMode("phone")} 
+                  className="w-full" 
+                  size="lg"
+                  variant="default"
+                >
+                  <Phone className="w-4 h-4 mr-2" />
+                  Sign in with Phone
+                </Button>
+                
+                <Button 
+                  onClick={handleEmailLogin} 
+                  className="w-full" 
+                  size="lg"
+                  variant="outline"
+                >
+                  <Mail className="w-4 h-4 mr-2" />
+                  Sign in with Email
+                </Button>
+
+                <div className="relative my-2">
+                  <div className="absolute inset-0 flex items-center">
+                    <span className="w-full border-t border-border" />
+                  </div>
+                  <div className="relative flex justify-center text-xs uppercase">
+                    <span className="bg-background px-2 text-muted-foreground">or</span>
+                  </div>
+                </div>
+
+                <Button 
+                  onClick={handleEmailSignup} 
+                  variant="secondary" 
+                  className="w-full" 
+                  size="lg"
+                >
+                  Create an Account
+                </Button>
+
+                <Button 
+                  onClick={handleGuestContinue} 
+                  variant="ghost" 
+                  className="w-full" 
+                  size="lg"
+                >
+                  Continue as Guest
+                </Button>
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-background px-2 text-muted-foreground">or</span>
-              </div>
-            </div>
-            <Button onClick={handleGuestContinue} variant="ghost" className="w-full" size="lg">
-              Continue as Guest
-            </Button>
-          </div>
+            </>
+          )}
+
+          {authMode === "phone" && (
+            <PhoneAuthForm 
+              onSuccess={handlePhoneSuccess} 
+              onBack={resetAuthMode} 
+            />
+          )}
         </DialogContent>
       </Dialog>
     </div>
