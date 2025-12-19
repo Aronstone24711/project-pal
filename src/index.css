@@ -4,7 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Arduino Builder Design System - Tech-forward, circuit-board inspired */
+/* Arduino Builder Design System - Weather-adaptive themes */
 
 @layer base {
   :root {
@@ -86,6 +86,120 @@
     --sidebar-border: 217 33% 17%;
     --sidebar-ring: 168 76% 50%;
   }
+
+  /* Weather-based Themes */
+  
+  /* Sunny Theme - Warm, bright, energetic */
+  .theme-sunny {
+    --background: 45 100% 97%;
+    --foreground: 30 20% 15%;
+    --card: 45 100% 99%;
+    --card-foreground: 30 20% 15%;
+    --primary: 35 100% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 45 80% 90%;
+    --secondary-foreground: 30 20% 15%;
+    --muted: 45 50% 93%;
+    --muted-foreground: 30 15% 45%;
+    --accent: 25 100% 55%;
+    --border: 45 50% 88%;
+  }
+
+  /* Cloudy Theme - Soft, muted, calm */
+  .theme-cloudy {
+    --background: 210 15% 96%;
+    --foreground: 210 20% 20%;
+    --card: 210 15% 99%;
+    --card-foreground: 210 20% 20%;
+    --primary: 210 40% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 90%;
+    --secondary-foreground: 210 20% 20%;
+    --muted: 210 15% 93%;
+    --muted-foreground: 210 15% 50%;
+    --accent: 195 50% 50%;
+    --border: 210 20% 88%;
+  }
+
+  /* Rainy Theme - Cool blues, cozy */
+  .theme-rainy {
+    --background: 215 30% 94%;
+    --foreground: 215 30% 15%;
+    --card: 215 30% 98%;
+    --card-foreground: 215 30% 15%;
+    --primary: 200 80% 45%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 215 40% 88%;
+    --secondary-foreground: 215 30% 15%;
+    --muted: 215 25% 91%;
+    --muted-foreground: 215 20% 45%;
+    --accent: 185 60% 45%;
+    --border: 215 30% 85%;
+  }
+
+  /* Cold Theme - Crisp, icy blues */
+  .theme-cold {
+    --background: 200 40% 96%;
+    --foreground: 200 30% 15%;
+    --card: 200 40% 99%;
+    --card-foreground: 200 30% 15%;
+    --primary: 195 80% 50%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 200 50% 90%;
+    --secondary-foreground: 200 30% 15%;
+    --muted: 200 35% 93%;
+    --muted-foreground: 200 20% 45%;
+    --accent: 180 60% 45%;
+    --border: 200 40% 88%;
+  }
+
+  /* Morning Theme - Fresh, warm sunrise */
+  .theme-morning {
+    --background: 35 80% 97%;
+    --foreground: 25 30% 15%;
+    --card: 35 80% 99%;
+    --card-foreground: 25 30% 15%;
+    --primary: 30 90% 55%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 35 60% 90%;
+    --secondary-foreground: 25 30% 15%;
+    --muted: 35 50% 93%;
+    --muted-foreground: 25 20% 45%;
+    --accent: 15 80% 55%;
+    --border: 35 60% 88%;
+  }
+
+  /* Evening Theme - Warm dusk, purple-orange */
+  .theme-evening {
+    --background: 270 20% 12%;
+    --foreground: 35 80% 95%;
+    --card: 270 25% 15%;
+    --card-foreground: 35 80% 95%;
+    --primary: 25 90% 55%;
+    --primary-foreground: 270 30% 10%;
+    --secondary: 270 20% 20%;
+    --secondary-foreground: 35 80% 95%;
+    --muted: 270 15% 18%;
+    --muted-foreground: 35 30% 70%;
+    --accent: 280 60% 60%;
+    --border: 270 20% 25%;
+  }
+
+  /* Night Theme - Galaxy, starry sky */
+  .theme-night {
+    --background: 240 30% 8%;
+    --foreground: 210 40% 95%;
+    --card: 240 35% 12%;
+    --card-foreground: 210 40% 95%;
+    --primary: 260 80% 65%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 240 30% 18%;
+    --secondary-foreground: 210 40% 95%;
+    --muted: 240 25% 15%;
+    --muted-foreground: 210 25% 60%;
+    --accent: 280 90% 70%;
+    --border: 240 30% 20%;
+  }
 }
 
 @layer base {
@@ -94,7 +208,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground font-sans antialiased transition-colors duration-500;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -116,5 +230,57 @@
       linear-gradient(90deg, hsl(var(--border)) 1px, transparent 1px),
       linear-gradient(hsl(var(--border)) 1px, transparent 1px);
     background-size: 20px 20px;
+  }
+
+  /* Starry night background for galaxy theme */
+  .theme-night body,
+  .theme-night .starry-bg {
+    background-image: 
+      radial-gradient(2px 2px at 20px 30px, hsl(210 40% 95% / 0.8), transparent),
+      radial-gradient(2px 2px at 40px 70px, hsl(260 80% 80% / 0.6), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsl(210 40% 95% / 0.9), transparent),
+      radial-gradient(2px 2px at 130px 80px, hsl(280 90% 85% / 0.5), transparent),
+      radial-gradient(1px 1px at 160px 120px, hsl(210 40% 95% / 0.7), transparent),
+      radial-gradient(2px 2px at 200px 50px, hsl(260 80% 75% / 0.6), transparent),
+      radial-gradient(1px 1px at 250px 160px, hsl(210 40% 95% / 0.8), transparent),
+      radial-gradient(2px 2px at 280px 90px, hsl(280 90% 80% / 0.5), transparent),
+      radial-gradient(1px 1px at 320px 130px, hsl(210 40% 95% / 0.9), transparent),
+      radial-gradient(2px 2px at 370px 70px, hsl(260 80% 85% / 0.4), transparent),
+      radial-gradient(ellipse 120px 80px at 50% 30%, hsl(260 60% 30% / 0.3), transparent),
+      radial-gradient(ellipse 150px 100px at 80% 70%, hsl(280 50% 25% / 0.2), transparent);
+    background-color: hsl(240 30% 8%);
+    background-size: 400px 200px;
+    animation: twinkle 8s ease-in-out infinite;
+  }
+
+  @keyframes twinkle {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+  }
+
+  /* Sunny glow effect */
+  .theme-sunny .sunny-glow {
+    box-shadow: 0 0 60px hsl(45 100% 60% / 0.2);
+  }
+
+  /* Rain animation */
+  .theme-rainy .rain-effect::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      linear-gradient(transparent 0%, hsl(200 80% 60% / 0.1) 50%, transparent 100%);
+    background-size: 2px 20px;
+    animation: rain 0.5s linear infinite;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  @keyframes rain {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 20px; }
   }
 }
