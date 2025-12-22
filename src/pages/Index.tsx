@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Helmet } from "react-helmet";
 import WelcomePage from "@/components/WelcomePage";
 import LanguageSelector from "@/components/LanguageSelector";
@@ -25,6 +26,7 @@ interface Language {
 type AppState = "welcome" | "location" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions";
 
 const Index = () => {
+  const navigate = useNavigate();
   const [state, setState] = useState<AppState>("welcome");
   const [isGuest, setIsGuest] = useState(false);
   const [language, setLanguage] = useState<Language | null>(null);
@@ -118,11 +120,11 @@ const Index = () => {
   };
 
   const handleLoginClick = () => {
-    toast.info("Login feature coming soon!");
+    navigate("/auth");
   };
 
   const handleSignupClick = () => {
-    toast.info("Sign up feature coming soon!");
+    navigate("/signup");
   };
 
   const handleSettingsClick = () => {
