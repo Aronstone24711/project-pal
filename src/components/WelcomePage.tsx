@@ -55,7 +55,8 @@ const WelcomePage = ({ onContinue, onLoginClick, onSignupClick }: WelcomePagePro
     });
     setLoading(false);
     if (error) {
-      toast.error("Google sign-in is not configured yet. Please use email or phone.");
+      console.error("Google sign-in error:", error);
+      toast.error("Google sign-in requires configuration. Please use Email or Phone to sign in for now.");
     }
   };
 
@@ -69,7 +70,8 @@ const WelcomePage = ({ onContinue, onLoginClick, onSignupClick }: WelcomePagePro
     });
     setLoading(false);
     if (error) {
-      toast.error("Apple sign-in is not configured yet. Please use email or phone.");
+      console.error("Apple sign-in error:", error);
+      toast.error("Apple sign-in requires configuration. Please use Email or Phone to sign in for now.");
     }
   };
 
