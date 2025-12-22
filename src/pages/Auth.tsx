@@ -76,7 +76,9 @@ const Auth = ({ mode: initialMode }: AuthPageProps) => {
 
     if (error) {
       if (error.message.includes("Invalid login credentials")) {
-        toast.error("Invalid email or password. Please try again.");
+        toast.error("No account found with this email, or the password is incorrect. Please check your credentials or sign up.");
+      } else if (error.message.includes("Email not confirmed")) {
+        toast.error("Please confirm your email before logging in.");
       } else {
         toast.error(error.message);
       }
