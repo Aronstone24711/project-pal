@@ -122,8 +122,8 @@ const Auth = ({ mode: initialMode }: AuthPageProps) => {
   return (
     <>
       <Helmet>
-        <title>{mode === "login" ? "Login" : "Sign Up"} | Arduino Builder</title>
-        <meta name="description" content={mode === "login" ? "Login to your Arduino Builder account" : "Create a new Arduino Builder account"} />
+        <title>{mode === "login" ? "Login" : "Sign Up"} | SearchAll</title>
+        <meta name="description" content={mode === "login" ? "Login to your SearchAll account" : "Create a new SearchAll account"} />
       </Helmet>
       
       <div className="min-h-screen bg-background starry-bg flex items-center justify-center px-4">
