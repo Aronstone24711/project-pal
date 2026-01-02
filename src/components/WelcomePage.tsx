@@ -89,11 +89,11 @@ const WelcomePage = ({ onContinue, onLoginClick, onSignupClick }: WelcomePagePro
         </div>
         
         <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-          Welcome to Arduino Builder
+          Welcome to SearchAll
         </h1>
         
         <p className="text-lg text-muted-foreground">
-          Scan your electronic components, discover exciting projects, and follow step-by-step visual instructions to bring your ideas to life.
+          Scan any items you have - electronics, paper, household objects - and discover exciting projects with step-by-step visual instructions.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">

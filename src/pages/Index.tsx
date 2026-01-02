@@ -134,8 +134,8 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Arduino Project Builder | Scan Components & Build Projects</title>
-        <meta name="description" content="Scan your Arduino and electronic components, get AI-powered project suggestions, and follow step-by-step visual instructions to build amazing projects." />
+        <title>SearchAll | Scan Items & Discover Projects</title>
+        <meta name="description" content="Scan any items - electronics, paper, household objects - and get AI-powered project suggestions with step-by-step visual instructions." />
       </Helmet>
       
       <div className="min-h-screen bg-background starry-bg">
@@ -148,7 +148,7 @@ const Index = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">Arduino Builder</h1>
+                <h1 className="text-xl font-bold text-foreground">SearchAll</h1>
                 <p className="text-xs text-muted-foreground">Scan • Discover • Create</p>
               </div>
             </div>
