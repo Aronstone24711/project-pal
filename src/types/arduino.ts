@@ -1,6 +1,6 @@
 export interface Component {
   name: string;
-  type: "sensor" | "actuator" | "module" | "board" | "passive" | "wire" | "power";
+  type: "electronic" | "craft" | "household" | "tool" | "recycled" | "natural" | "office" | "other";
   quantity: number;
   description: string;
 }
