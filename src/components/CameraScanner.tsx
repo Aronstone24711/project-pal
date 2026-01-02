@@ -120,9 +120,9 @@ const CameraScanner = ({ onComponentsIdentified, language }: CameraScannerProps)
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold text-foreground">Scan Your Components</h2>
+        <h2 className="text-2xl font-bold text-foreground">Scan Your Items</h2>
         <p className="text-muted-foreground">
-          Take a photo or upload an image of your Arduino and electronic components
+          Take a photo of anything - paper, pencils, electronics, household items, or recycled materials!
         </p>
       </div>
 
@@ -237,7 +237,7 @@ const CameraScanner = ({ onComponentsIdentified, language }: CameraScannerProps)
       <canvas ref={canvasRef} className="hidden" />
 
       <div className="text-center text-sm text-muted-foreground">
-        <p>📸 Tip: Ensure good lighting and spread components apart for better detection</p>
+        <p>📸 Tip: Ensure good lighting and spread items apart for better detection</p>
       </div>
     </div>
   );

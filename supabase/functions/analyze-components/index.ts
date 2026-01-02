@@ -21,33 +21,41 @@ serve(async (req) => {
     let messages: any[] = [];
     
     if (action === 'identify') {
-      // Identify components from image
+      // Identify ANY items from image - electronics, craft supplies, household items, anything!
       messages = [
         {
           role: "system",
-          content: `You are an expert electronics component identifier. Analyze the image and identify all Arduino, electronic components, sensors, and modules visible. 
+          content: `You are an expert item identifier for DIY and craft projects. Analyze the image and identify ALL items visible - this can include:
+- Electronic components (Arduino, sensors, LEDs, wires, etc.)
+- Craft supplies (paper, cardboard, fabric, glue, tape, etc.)
+- Household items (bottles, cans, containers, rubber bands, etc.)
+- Office supplies (pencils, pens, paper clips, rulers, etc.)
+- Recycled materials (toilet paper rolls, egg cartons, plastic bottles, etc.)
+- Natural materials (sticks, leaves, stones, etc.)
+- Tools (scissors, rulers, etc.)
+- Anything else that could be used to make something creative!
           
 Return a JSON response with this exact structure:
 {
   "components": [
     {
-      "name": "Component Name",
-      "type": "sensor|actuator|module|board|passive|wire|power",
+      "name": "Item Name",
+      "type": "electronic|craft|household|tool|recycled|natural|office|other",
       "quantity": 1,
-      "description": "Brief description of what this component does"
+      "description": "Brief description of this item and what it could be used for"
     }
   ],
   "confidence": "high|medium|low"
 }
 
-Be thorough and identify every component you can see including wires, resistors, LEDs, buttons, etc.`
+Be thorough and identify EVERYTHING you can see - paper, pencils, used pens, cardboard, bottles, string, tape, etc. Think creatively about what projects could use these items.`
         },
         {
           role: "user",
           content: [
             {
               type: "text",
-              text: "Identify all electronic components in this image."
+              text: "Identify all items in this image that could be used for DIY projects, crafts, or creative builds."
             },
             {
               type: "image_url",
@@ -59,7 +67,7 @@ Be thorough and identify every component you can see including wires, resistors,
         }
       ];
     } else if (action === 'suggest_projects') {
-      // Suggest projects based on identified components
+      // Suggest projects based on identified items (can be anything!)
       const languageInstruction = language !== 'en' 
         ? `IMPORTANT: Respond with all text content (name, description, tags) in ${language} language.` 
         : '';
@@ -73,7 +81,18 @@ Be thorough and identify every component you can see including wires, resistors,
       messages = [
         {
           role: "system",
-          content: `You are an Arduino project expert. Based on the components provided, suggest creative and educational projects that can be built.
+          content: `You are a creative DIY project expert. Based on the items provided (which could be electronics, craft supplies, household items, recycled materials, office supplies, or anything else), suggest creative and fun projects that can be made.
+
+Projects can include:
+- Electronics projects (if electronic components are available)
+- Paper crafts (origami, paper airplanes, cards, etc.)
+- Art projects (drawings, sculptures, collages)
+- Useful items (organizers, holders, decorations)
+- Toys and games
+- Science experiments
+- Recycled art
+- Any creative build!
+
 ${languageInstruction}
 ${complexityInstruction}
 
@@ -84,37 +103,38 @@ Return a JSON response with this exact structure:
       "id": "unique-id",
       "name": "Project Name",
       "difficulty": "beginner|intermediate|advanced",
-      "description": "Brief description of what the project does",
+      "description": "Brief description of what the project does or creates",
       "estimatedTime": "30 mins",
-      "componentsUsed": ["Component 1", "Component 2"],
-      "tags": ["IoT", "Automation", "Fun"]
+      "componentsUsed": ["Item 1", "Item 2"],
+      "tags": ["Craft", "Fun", "Educational", "Decoration", "Toy", "Useful"]
     }
   ]
 }
 
-Suggest 5-8 diverse projects ranging from simple to complex.`
+Suggest 5-8 diverse projects ranging from simple to complex. Be creative! Think about what fun things can be made with everyday items.`
         },
         {
           role: "user",
-          content: `Suggest projects I can build with these components: ${JSON.stringify(components)}`
+          content: `Suggest creative projects I can make with these items: ${JSON.stringify(components)}`
         }
       ];
     } else if (action === 'get_instructions') {
-      // Get detailed instructions for a specific project
+      // Get detailed instructions for a specific project (works for any type of project)
       const languageInstruction = language !== 'en' 
-        ? `IMPORTANT: Respond with all text content (name, overview, descriptions, tips, explanations, testing steps, troubleshooting) in ${language} language. Keep technical terms like pin names and code in English.` 
+        ? `IMPORTANT: Respond with all text content (name, overview, descriptions, tips, explanations, testing steps, troubleshooting) in ${language} language. Keep technical terms like pin names and code in English if applicable.` 
         : '';
       
       const complexityInstruction = englishLevel === 'easy' 
-        ? 'CRITICAL: Use very simple words and short sentences. Explain everything as if teaching an 8-year-old child. Avoid all technical jargon - use everyday words instead. For example, say "the long leg of the LED" instead of "the anode".'
+        ? 'CRITICAL: Use very simple words and short sentences. Explain everything as if teaching an 8-year-old child. Avoid all technical jargon - use everyday words instead.'
         : englishLevel === 'hard'
-        ? 'Use technical terminology freely. Include detailed explanations of why each step is necessary. Reference datasheets and technical specifications where relevant. Suitable for experienced engineers and makers.'
-        : 'Use clear, standard vocabulary. Explain technical terms when first used. Balance between accessibility and accuracy.';
+        ? 'Use technical terminology freely. Include detailed explanations of why each step is necessary. Suitable for experienced makers.'
+        : 'Use clear, standard vocabulary. Explain terms when first used. Balance between accessibility and accuracy.';
       
       messages = [
         {
           role: "system",
-          content: `You are an Arduino project instructor. Provide detailed, step-by-step instructions for building the project with visual descriptions.
+          content: `You are a DIY project instructor. Provide detailed, step-by-step instructions for making the project. This could be an electronics project, a craft, a paper creation, or anything else!
+
 ${languageInstruction}
 ${complexityInstruction}
 
@@ -122,12 +142,12 @@ Return a JSON response with this exact structure:
 {
   "project": {
     "name": "Project Name",
-    "overview": "What this project does and why it's useful",
+    "overview": "What this project creates and why it's fun/useful",
     "components": [
       {
-        "name": "Component Name",
+        "name": "Item Name",
         "quantity": 1,
-        "notes": "Any specific notes about this component"
+        "notes": "Any specific notes about this item"
       }
     ],
     "steps": [
@@ -137,21 +157,21 @@ Return a JSON response with this exact structure:
         "description": "Detailed description of what to do",
         "connections": [
           {
-            "from": "Arduino Pin 13",
-            "to": "LED Positive (long leg)",
-            "wireColor": "red"
+            "from": "Part A",
+            "to": "Part B",
+            "wireColor": "optional - for electronic projects"
           }
         ],
         "tips": ["Helpful tip for this step"],
-        "imageDescription": "Description of what the circuit should look like at this stage"
+        "imageDescription": "Description of what the project should look like at this stage"
       }
     ],
     "code": {
-      "filename": "project_name.ino",
-      "code": "// Arduino code here",
-      "explanation": "Line by line explanation of key parts of the code"
+      "filename": "project_code.ino",
+      "code": "// Code here - only if this is an electronics project, otherwise leave empty",
+      "explanation": "Explanation of the code - only if applicable"
     },
-    "testing": ["Step 1 to test", "Step 2 to test"],
+    "testing": ["Step 1 to test or verify", "Step 2 to check"],
     "troubleshooting": [
       {
         "problem": "Common problem",
@@ -161,11 +181,11 @@ Return a JSON response with this exact structure:
   }
 }
 
-Be extremely detailed with connection instructions. Use specific pin numbers and component leg identifications.`
+Be extremely detailed with instructions. For craft projects, describe folding, cutting, gluing steps clearly. For electronics, use specific pin numbers.`
         },
         {
           role: "user",
-          content: `Provide detailed build instructions for this project: ${projectId}. Available components: ${JSON.stringify(components)}`
+          content: `Provide detailed build instructions for this project: ${projectId}. Available items: ${JSON.stringify(components)}`
         }
       ];
     } else if (action === 'fix_code') {

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, Cpu, Zap, Radio, CircuitBoard, Cable, Battery } from "lucide-react";
+import { ArrowLeft, ArrowRight, Cpu, Scissors, Home, Wrench, Recycle, Leaf, FileText, HelpCircle } from "lucide-react";
 import { Component } from "@/types/arduino";
 
 interface ComponentsListProps {
@@ -11,23 +11,25 @@ interface ComponentsListProps {
 }
 
 const typeIcons: Record<Component["type"], React.ReactNode> = {
-  sensor: <Radio className="w-5 h-5" />,
-  actuator: <Zap className="w-5 h-5" />,
-  module: <CircuitBoard className="w-5 h-5" />,
-  board: <Cpu className="w-5 h-5" />,
-  passive: <CircuitBoard className="w-5 h-5" />,
-  wire: <Cable className="w-5 h-5" />,
-  power: <Battery className="w-5 h-5" />,
+  electronic: <Cpu className="w-5 h-5" />,
+  craft: <Scissors className="w-5 h-5" />,
+  household: <Home className="w-5 h-5" />,
+  tool: <Wrench className="w-5 h-5" />,
+  recycled: <Recycle className="w-5 h-5" />,
+  natural: <Leaf className="w-5 h-5" />,
+  office: <FileText className="w-5 h-5" />,
+  other: <HelpCircle className="w-5 h-5" />,
 };
 
 const typeColors: Record<Component["type"], string> = {
-  sensor: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
-  actuator: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
-  module: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
-  board: "bg-green-500/10 text-green-600 dark:text-green-400",
-  passive: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
-  wire: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
-  power: "bg-red-500/10 text-red-600 dark:text-red-400",
+  electronic: "bg-blue-500/10 text-blue-600 dark:text-blue-400",
+  craft: "bg-pink-500/10 text-pink-600 dark:text-pink-400",
+  household: "bg-orange-500/10 text-orange-600 dark:text-orange-400",
+  tool: "bg-gray-500/10 text-gray-600 dark:text-gray-400",
+  recycled: "bg-green-500/10 text-green-600 dark:text-green-400",
+  natural: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+  office: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400",
+  other: "bg-purple-500/10 text-purple-600 dark:text-purple-400",
 };
 
 const ComponentsList = ({ components, onProceed, onBack }: ComponentsListProps) => {
@@ -47,8 +49,8 @@ const ComponentsList = ({ components, onProceed, onBack }: ComponentsListProps) 
           Back
         </Button>
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-foreground">Identified Components</h2>
-          <p className="text-sm text-muted-foreground">{components.length} components found</p>
+          <h2 className="text-2xl font-bold text-foreground">Identified Items</h2>
+          <p className="text-sm text-muted-foreground">{components.length} items found</p>
         </div>
         <div className="w-20" />
       </div>
