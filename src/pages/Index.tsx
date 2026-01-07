@@ -38,8 +38,7 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { weatherData } = useTheme();
 
-  const handleWelcomeContinue = (guest: boolean) => {
-    setIsGuest(guest);
+  const handleWelcomeContinue = () => {
     setState("location");
   };
 
@@ -179,11 +178,7 @@ const Index = () => {
 
         <main className="container mx-auto px-4 py-6">
           {state === "welcome" && (
-            <WelcomePage
-              onContinue={handleWelcomeContinue}
-              onLoginClick={handleLoginClick}
-              onSignupClick={handleSignupClick}
-            />
+            <WelcomePage onContinue={handleWelcomeContinue} />
           )}
 
           {state === "location" && (
