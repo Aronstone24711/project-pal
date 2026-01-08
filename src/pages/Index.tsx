@@ -12,9 +12,9 @@ import ProjectInstructions from "@/components/ProjectInstructions";
 import HeaderMenu from "@/components/HeaderMenu";
 import LocationSelector from "@/components/LocationSelector";
 import WeatherDisplay from "@/components/WeatherDisplay";
+import SettingsDialog from "@/components/SettingsDialog";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Component, Project } from "@/types/arduino";
-import { toast } from "sonner";
 
 interface Language {
   code: string;
@@ -37,6 +37,7 @@ const Index = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { weatherData } = useTheme();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const handleWelcomeContinue = () => {
     setState("location");
@@ -127,7 +128,7 @@ const Index = () => {
   };
 
   const handleSettingsClick = () => {
-    toast.info("Settings feature coming soon!");
+    setSettingsOpen(true);
   };
 
   return (
@@ -235,6 +236,12 @@ const Index = () => {
         <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-sm text-muted-foreground bg-background/80 backdrop-blur-sm border-t border-border/40">
           Created by Leeroy Bansal
         </footer>
+
+        <SettingsDialog
+          open={settingsOpen}
+          onOpenChange={setSettingsOpen}
+          onReset={handleReset}
+        />
       </div>
     </>
   );
