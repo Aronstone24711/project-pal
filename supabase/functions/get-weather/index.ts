@@ -70,6 +70,9 @@ serve(async (req) => {
       if (weatherMain.includes('rain') || weatherMain.includes('drizzle')) {
         theme = 'rainy';
         themeDescription = 'Rainy day';
+      } else if (weatherMain.includes('smoke') || weatherMain.includes('haze') || weatherMain.includes('fog') || weatherMain.includes('mist')) {
+        theme = 'cloudy';
+        themeDescription = 'Hazy/Smoky';
       } else if (weatherMain.includes('cloud')) {
         theme = 'cloudy';
         themeDescription = 'Cloudy day';
@@ -88,10 +91,11 @@ serve(async (req) => {
       weather: {
         main: weatherMain,
         description: data.weather?.[0]?.description,
-        temp: Math.round(temp),
+        temp: Math.round(temp * 10) / 10, // Keep one decimal for precision
         humidity: data.main?.humidity,
         city: data.name,
         country: data.sys?.country,
+        feelsLike: data.main?.feels_like ? Math.round(data.main.feels_like * 10) / 10 : undefined,
       },
       localHour: hour,
     };
