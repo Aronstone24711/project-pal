@@ -17,8 +17,8 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
-        name: "SearchAll",
-        short_name: "SearchAll",
+        name: "Search All",
+        short_name: "Search All",
         description: "Scan items and discover DIY projects with step-by-step instructions",
         theme_color: "#1a1a2e",
         background_color: "#1a1a2e",

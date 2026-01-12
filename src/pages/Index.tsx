@@ -134,7 +134,7 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>SearchAll | Scan Items & Discover Projects</title>
+        <title>Search All | Scan Items & Discover Projects</title>
         <meta name="description" content="Scan any items - electronics, paper, household objects - and get AI-powered project suggestions with step-by-step visual instructions." />
       </Helmet>
       
@@ -148,7 +148,7 @@ const Index = () => {
                 </svg>
               </div>
               <div>
-                <h1 className="text-xl font-bold text-foreground">SearchAll</h1>
+                <h1 className="text-xl font-bold text-foreground">Search All</h1>
                 <p className="text-xs text-muted-foreground">Scan • Discover • Create</p>
               </div>
             </div>

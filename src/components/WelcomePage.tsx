@@ -15,7 +15,7 @@ const WelcomePage = ({ onContinue }: WelcomePageProps) => {
         </div>
         
         <h1 className="text-4xl md:text-5xl font-bold text-foreground">
-          Welcome to SearchAll
+          Welcome to Search All
         </h1>
         
         <p className="text-lg text-muted-foreground">
