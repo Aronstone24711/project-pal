@@ -237,21 +237,13 @@
   .theme-night body,
   .theme-night .starry-bg {
     background-image: 
-      radial-gradient(2px 2px at 20px 30px, hsl(210 40% 95% / 0.8), transparent),
-      radial-gradient(2px 2px at 40px 70px, hsl(260 80% 80% / 0.6), transparent),
-      radial-gradient(1px 1px at 90px 40px, hsl(210 40% 95% / 0.9), transparent),
-      radial-gradient(2px 2px at 130px 80px, hsl(280 90% 85% / 0.5), transparent),
-      radial-gradient(1px 1px at 160px 120px, hsl(210 40% 95% / 0.7), transparent),
-      radial-gradient(2px 2px at 200px 50px, hsl(260 80% 75% / 0.6), transparent),
-      radial-gradient(1px 1px at 250px 160px, hsl(210 40% 95% / 0.8), transparent),
-      radial-gradient(2px 2px at 280px 90px, hsl(280 90% 80% / 0.5), transparent),
-      radial-gradient(1px 1px at 320px 130px, hsl(210 40% 95% / 0.9), transparent),
-      radial-gradient(2px 2px at 370px 70px, hsl(260 80% 85% / 0.4), transparent),
-      radial-gradient(ellipse 120px 80px at 50% 30%, hsl(260 60% 30% / 0.3), transparent),
-      radial-gradient(ellipse 150px 100px at 80% 70%, hsl(280 50% 25% / 0.2), transparent);
+      radial-gradient(1px 1px at 20px 30px, hsl(210 40% 95% / 0.7), transparent),
+      radial-gradient(1px 1px at 90px 40px, hsl(210 40% 95% / 0.8), transparent),
+      radial-gradient(1px 1px at 160px 120px, hsl(210 40% 95% / 0.6), transparent),
+      radial-gradient(1px 1px at 250px 160px, hsl(210 40% 95% / 0.7), transparent),
+      radial-gradient(1px 1px at 320px 130px, hsl(210 40% 95% / 0.8), transparent);
     background-color: hsl(240 30% 8%);
     background-size: 400px 200px;
-    animation: twinkle 8s ease-in-out infinite;
   }
 
   @keyframes twinkle {
