@@ -246,18 +246,10 @@
     background-size: 400px 200px;
   }
 
-  @keyframes twinkle {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.95; }
-  }
-
   /* Sunny glow effect */
   .theme-sunny .sunny-glow {
     box-shadow: 0 0 60px hsl(45 100% 60% / 0.2);
   }
-
-  /* Rain animation */
-  .theme-rainy .rain-effect::before {
     content: '';
     position: fixed;
     top: 0;
