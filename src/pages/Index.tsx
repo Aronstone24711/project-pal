@@ -143,14 +143,12 @@ const Index = () => {
         <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center sunny-glow">
-                <svg className="w-6 h-6 text-primary-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z" />
-                </svg>
+              <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center overflow-hidden sunny-glow">
+                <img src={searchAllLogo} alt="Search All Logo" className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-screen" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Search All</h1>
-                <p className="text-xs text-muted-foreground">Scan • Discover • Create</p>
+                <p className="text-xs text-muted-foreground">Place Where Ideas Meet Innovation</p>
               </div>
             </div>
             
