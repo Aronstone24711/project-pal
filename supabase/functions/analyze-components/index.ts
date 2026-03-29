@@ -96,6 +96,11 @@ Projects can include:
 ${languageInstruction}
 ${complexityInstruction}
 
+CRITICAL RULES FOR DIFFICULTY LEVELS:
+- "beginner": Simple projects anyone can do in under 30 minutes with basic skills.
+- "intermediate": Projects requiring some skill, multiple steps, and 30-90 minutes.
+- "advanced": MUST be genuinely complex, engineering-level projects. Examples: working robots, automated systems, IoT devices with sensors and actuators, motorized machines, complex circuits with multiple ICs, structural engineering projects, coded interactive installations, multi-stage mechanisms. Do NOT label simple crafts or basic LED circuits as "advanced". Advanced projects should require real technical knowledge, multiple subsystems, and 2+ hours of work.
+
 Return a JSON response with this exact structure:
 {
   "projects": [
@@ -111,7 +116,7 @@ Return a JSON response with this exact structure:
   ]
 }
 
-Suggest 5-8 diverse projects ranging from simple to complex. Be creative! Think about what fun things can be made with everyday items.`
+Suggest 5-8 diverse projects ranging from simple to complex. Be creative! For advanced projects, think real engineering — automated mechanisms, programmable systems, sensor-driven devices, complex structural builds, or multi-component machines.`
         },
         {
           role: "user",
