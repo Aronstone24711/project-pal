@@ -155,6 +155,14 @@ const LocationSelector = ({ onLocationSet }: LocationSelectorProps) => {
               Current: {weatherData.city}, {weatherData.country} - {weatherData.temp}°C, {weatherData.description}
             </div>
           )}
+
+          <Button
+            variant="ghost"
+            onClick={onLocationSet}
+            className="w-full text-muted-foreground hover:text-foreground"
+          >
+            Continue without location →
+          </Button>
         </CardContent>
       </Card>
     </div>
