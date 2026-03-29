@@ -14,6 +14,7 @@ import LocationSelector from "@/components/LocationSelector";
 import WeatherDisplay from "@/components/WeatherDisplay";
 import SettingsDialog from "@/components/SettingsDialog";
 import { useTheme } from "@/contexts/ThemeContext";
+import searchAllLogo from "@/assets/searchall-logo.png";
 import { Component, Project } from "@/types/arduino";
 
 interface Language {

@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import searchAllLogo from "@/assets/searchall-logo.png";
 
 interface WelcomePageProps {
   onContinue: () => void;
