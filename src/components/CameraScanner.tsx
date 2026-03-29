@@ -49,6 +49,15 @@ const CameraScanner = ({ onComponentsIdentified, language }: CameraScannerProps)
     }
   }, [toast]);
 
+  // Cleanup stream on unmount
+  useEffect(() => {
+    return () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [stream]);
+
   const stopCamera = useCallback(() => {
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
