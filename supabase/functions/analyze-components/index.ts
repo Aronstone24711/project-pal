@@ -138,10 +138,29 @@ Suggest 5-8 diverse projects ranging from simple to complex. Be creative! For ad
       messages = [
         {
           role: "system",
-          content: `You are a DIY project instructor. Provide detailed, step-by-step instructions for making the project. This could be an electronics project, a craft, a paper creation, or anything else!
+          content: `You are a professional electronics engineer and DIY expert who builds real, working projects. Your instructions MUST be 100% accurate and verified.
 
 ${languageInstruction}
 ${complexityInstruction}
+
+CRITICAL ACCURACY RULES:
+1. **Pin numbers must be REAL**: Use actual, correct GPIO/analog/digital pin numbers for the specific microcontroller (Arduino Uno, ESP32, etc.). For Arduino Uno: Digital pins 0-13, Analog A0-A5. For ESP32: GPIO 0-39. NEVER invent pin numbers.
+2. **Circuit connections must be PHYSICALLY CORRECT**: 
+   - LEDs MUST have current-limiting resistors (220Ω-330Ω typical). Never connect LED directly to a pin without a resistor.
+   - Specify which leg is anode (+, longer leg) and cathode (-, shorter leg).
+   - Always include GND connections. Every circuit needs a complete path.
+   - Sensors: specify VCC, GND, and signal pins correctly per the component's actual datasheet.
+   - Servos: Signal, VCC (5V), GND — in correct order for standard servo connectors.
+   - I2C devices: SDA and SCL pins must match the board (Arduino Uno: A4=SDA, A5=SCL; ESP32: GPIO21=SDA, GPIO22=SCL).
+3. **Code must COMPILE and RUN**: 
+   - Include ALL necessary #include statements and library names.
+   - Use correct function names and syntax (e.g., analogRead not analogInput).
+   - Pin modes must match usage (INPUT, OUTPUT, INPUT_PULLUP).
+   - Variable types must be correct.
+   - Code must match the EXACT pin numbers used in the circuit.
+   - Add comments explaining each section.
+4. **For craft/non-electronic projects**: Provide exact measurements (cm/inches), specific materials, and step-by-step visual descriptions.
+5. **Double-check everything**: Before responding, mentally verify each connection and each line of code is correct.
 
 Return a JSON response with this exact structure:
 {
@@ -152,45 +171,50 @@ Return a JSON response with this exact structure:
       {
         "name": "Item Name",
         "quantity": 1,
-        "notes": "Any specific notes about this item"
+        "notes": "Specific specs - e.g., '220Ω resistor' not just 'resistor', '5mm red LED' not just 'LED'"
       }
     ],
     "steps": [
       {
         "stepNumber": 1,
         "title": "Step Title",
-        "description": "Detailed description of what to do",
+        "description": "VERY detailed description. For circuits: specify EXACT pin numbers, which row/column on breadboard, wire colors. Example: 'Connect the LED anode (longer leg) to a 220Ω resistor. Connect the other end of the resistor to Arduino pin 9. Connect the LED cathode (shorter leg) to the GND rail on the breadboard.'",
         "connections": [
           {
-            "from": "Part A",
-            "to": "Part B",
-            "wireColor": "optional - for electronic projects"
+            "from": "Arduino Pin 9",
+            "to": "220Ω Resistor → LED Anode (long leg)",
+            "wireColor": "red"
+          },
+          {
+            "from": "LED Cathode (short leg)",
+            "to": "GND Rail",
+            "wireColor": "black"
           }
         ],
-        "tips": ["Helpful tip for this step"],
-        "imageDescription": "Description of what the project should look like at this stage"
+        "tips": ["Helpful tip with real technical advice"],
+        "imageDescription": "Description of what the circuit/project should look like at this stage"
       }
     ],
     "code": {
       "filename": "project_code.ino",
-      "code": "// Code here - only if this is an electronics project, otherwise leave empty",
-      "explanation": "Explanation of the code - only if applicable"
+      "code": "// Complete, compilable, correct code that matches the circuit exactly",
+      "explanation": "Line-by-line explanation of what the code does and why"
     },
-    "testing": ["Step 1 to test or verify", "Step 2 to check"],
+    "testing": ["Specific test: 'Upload code, LED on pin 9 should blink every 1 second'", "What to check if it doesn't work"],
     "troubleshooting": [
       {
-        "problem": "Common problem",
-        "solution": "How to fix it"
+        "problem": "LED doesn't light up",
+        "solution": "1. Check LED polarity - longer leg should connect to resistor side. 2. Verify pin 9 connection. 3. Check GND wire. 4. Try a different LED in case it's burned out."
       }
     ]
   }
 }
 
-Be extremely detailed with instructions. For craft projects, describe folding, cutting, gluing steps clearly. For electronics, use specific pin numbers.`
+IMPORTANT: Every connection in "connections" array must have SPECIFIC, REAL pin identifiers — never vague descriptions like "connect to board" or "attach wire".`
         },
         {
           role: "user",
-          content: `Provide detailed build instructions for this project: ${projectId}. Available items: ${JSON.stringify(components)}`
+          content: `Provide detailed, ACCURATE build instructions for this project: ${projectId}. Available items: ${JSON.stringify(components)}. Remember: every pin number, every connection, and every line of code must be correct and verified.`
         }
       ];
     } else if (action === 'fix_code') {
