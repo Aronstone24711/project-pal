@@ -50,7 +50,16 @@ const Index = () => {
 
   const handleLanguageSelect = (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
-    setState("age");
+    // If user is changing language mid-flow, return to where they were
+    if (age !== null) {
+      if (components.length > 0) {
+        setState("components");
+      } else {
+        setState("scan");
+      }
+    } else {
+      setState("age");
+    }
   };
 
   const handleAgeSelect = (selectedAge: number, childStatus: boolean) => {
