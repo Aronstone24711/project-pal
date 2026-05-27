@@ -132,6 +132,10 @@ const Index = () => {
     setSettingsOpen(true);
   };
 
+  const handleChangeLanguage = () => {
+    setState("language");
+  };
+
   return (
     <>
       <Helmet>
@@ -155,9 +159,13 @@ const Index = () => {
             <div className="flex items-center gap-4">
               {weatherData && <WeatherDisplay />}
               {state !== "welcome" && state !== "location" && state !== "language" && language && (
-                <span className="text-sm text-muted-foreground hidden sm:inline">
+                <button
+                  onClick={handleChangeLanguage}
+                  className="text-sm text-muted-foreground hover:text-foreground transition-colors hidden sm:inline"
+                  title="Change language"
+                >
                   {language.flag} {language.name}
-                </span>
+                </button>
               )}
               {state !== "welcome" && (
                 <button
@@ -240,6 +248,7 @@ const Index = () => {
           open={settingsOpen}
           onOpenChange={setSettingsOpen}
           onReset={handleReset}
+          onChangeLanguage={handleChangeLanguage}
         />
       </div>
     </>
