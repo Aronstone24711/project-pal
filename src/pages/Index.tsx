@@ -176,7 +176,7 @@ const Index = () => {
           </div>
         </header>
 
-        <main className="container mx-auto px-4 py-6">
+        <main className="container mx-auto px-4 py-6 pb-24">
           {state === "welcome" && (
             <WelcomePage onContinue={handleWelcomeContinue} />
           )}
