@@ -156,13 +156,15 @@ const LocationSelector = ({ onLocationSet }: LocationSelectorProps) => {
             </div>
           )}
 
-          <Button
-            variant="ghost"
-            onClick={onLocationSet}
-            className="w-full text-muted-foreground hover:text-foreground"
-          >
-            Continue without location →
-          </Button>
+          <div className="pt-4 border-t border-border">
+            <Button
+              variant="outline"
+              onClick={onLocationSet}
+              className="w-full border-dashed border-2 hover:border-solid"
+            >
+              Continue without location →
+            </Button>
+          </div>
         </CardContent>
       </Card>
     </div>
