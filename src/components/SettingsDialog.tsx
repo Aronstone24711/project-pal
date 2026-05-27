@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { UserPlus, RotateCcw, FolderOpen, Trash2, ChevronRight } from "lucide-react";
+import { UserPlus, RotateCcw, FolderOpen, Trash2, ChevronRight, Languages } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { User } from "@supabase/supabase-js";
 import { toast } from "sonner";
@@ -17,6 +17,7 @@ interface SettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onReset: () => void;
+  onChangeLanguage: () => void;
 }
 
 interface SavedProject {
@@ -25,7 +26,7 @@ interface SavedProject {
   created_at: string;
 }
 
-const SettingsDialog = ({ open, onOpenChange, onReset }: SettingsDialogProps) => {
+const SettingsDialog = ({ open, onOpenChange, onReset, onChangeLanguage }: SettingsDialogProps) => {
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
@@ -98,6 +99,11 @@ const SettingsDialog = ({ open, onOpenChange, onReset }: SettingsDialogProps) =>
   const handleAddAccount = () => {
     onOpenChange(false);
     navigate("/auth");
+  };
+
+  const handleChangeLanguage = () => {
+    onOpenChange(false);
+    onChangeLanguage();
   };
 
   const handleResetAll = () => {
@@ -181,6 +187,24 @@ const SettingsDialog = ({ open, onOpenChange, onReset }: SettingsDialogProps) =>
                   <p className="text-sm text-muted-foreground">
                     {user ? "Switch or add another account" : "Login or create account"}
                   </p>
+                </div>
+              </div>
+              <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+            </button>
+
+            <Separator />
+
+            <button
+              onClick={handleChangeLanguage}
+              className="w-full flex items-center justify-between p-4 rounded-lg hover:bg-muted/50 transition-colors group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Languages className="w-5 h-5 text-primary" />
+                </div>
+                <div className="text-left">
+                  <p className="font-medium text-foreground">Change Language</p>
+                  <p className="text-sm text-muted-foreground">Switch the instruction language</p>
                 </div>
               </div>
               <ChevronRight className="w-5 h-5 text-muted-foreground group-hover:text-foreground transition-colors" />
