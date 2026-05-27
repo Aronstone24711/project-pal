@@ -13,8 +13,6 @@ import HeaderMenu from "@/components/HeaderMenu";
 import LocationSelector from "@/components/LocationSelector";
 import WeatherDisplay from "@/components/WeatherDisplay";
 import SettingsDialog from "@/components/SettingsDialog";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Languages } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import searchAllLogo from "@/assets/searchall-logo.png";
 import { Component, Project } from "@/types/arduino";
@@ -41,7 +39,6 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { weatherData } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [languageDialogOpen, setLanguageDialogOpen] = useState(false);
 
   const handleWelcomeContinue = () => {
     setState("location");
@@ -53,10 +50,7 @@ const Index = () => {
 
   const handleLanguageSelect = (selectedLanguage: Language) => {
     setLanguage(selectedLanguage);
-    if (state === "language") {
-      setState("age");
-    }
-    setLanguageDialogOpen(false);
+    setState("age");
   };
 
   const handleAgeSelect = (selectedAge: number, childStatus: boolean) => {
@@ -160,18 +154,10 @@ const Index = () => {
             
             <div className="flex items-center gap-4">
               {weatherData && <WeatherDisplay />}
-              {state !== "welcome" && state !== "location" && state !== "language" && (
-                <button
-                  onClick={() => setLanguageDialogOpen(true)}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1"
-                  title="Change language"
-                >
-                  {language ? (
-                    <span>{language.flag} <span className="hidden sm:inline">{language.name}</span></span>
-                  ) : (
-                    <Languages className="w-4 h-4" />
-                  )}
-                </button>
+              {state !== "welcome" && state !== "location" && state !== "language" && language && (
+                <span className="text-sm text-muted-foreground hidden sm:inline">
+                  {language.flag} {language.name}
+                </span>
               )}
               {state !== "welcome" && (
                 <button
@@ -255,15 +241,6 @@ const Index = () => {
           onOpenChange={setSettingsOpen}
           onReset={handleReset}
         />
-
-        <Dialog open={languageDialogOpen} onOpenChange={setLanguageDialogOpen}>
-          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Change Language</DialogTitle>
-            </DialogHeader>
-            <LanguageSelector onLanguageSelect={handleLanguageSelect} />
-          </DialogContent>
-        </Dialog>
       </div>
     </>
   );
