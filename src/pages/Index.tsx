@@ -13,6 +13,7 @@ import HeaderMenu from "@/components/HeaderMenu";
 import LocationSelector from "@/components/LocationSelector";
 import WeatherDisplay from "@/components/WeatherDisplay";
 import SettingsDialog from "@/components/SettingsDialog";
+import DebugProject from "@/components/DebugProject";
 import { useTheme } from "@/contexts/ThemeContext";
 import searchAllLogo from "@/assets/searchall-logo.png";
 import { Component, Project } from "@/types/arduino";
@@ -24,7 +25,7 @@ interface Language {
   flag: string;
 }
 
-type AppState = "welcome" | "location" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions";
+type AppState = "welcome" | "location" | "language" | "age" | "englishLevel" | "scan" | "components" | "projects" | "instructions" | "debug";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -42,6 +43,10 @@ const Index = () => {
 
   const handleWelcomeContinue = () => {
     setState("location");
+  };
+
+  const handleDebugClick = () => {
+    setState("debug");
   };
 
   const handleLocationSet = () => {
@@ -195,7 +200,11 @@ const Index = () => {
 
         <main className="container mx-auto px-4 py-6 pb-24">
           {state === "welcome" && (
-            <WelcomePage onContinue={handleWelcomeContinue} />
+            <WelcomePage onContinue={handleWelcomeContinue} onDebug={handleDebugClick} />
+          )}
+
+          {state === "debug" && (
+            <DebugProject language={language?.code || "en"} onBack={() => setState("welcome")} />
           )}
 
           {state === "location" && (

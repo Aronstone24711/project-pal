@@ -11,7 +11,8 @@ serve(async (req) => {
   }
 
   try {
-    const { imageBase64, action, projectId, components, language = 'en', englishLevel = 'medium' } = await req.json();
+    const body = await req.json();
+    const { imageBase64, action, projectId, components, language = 'en', englishLevel = 'medium' } = body;
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -219,7 +220,7 @@ IMPORTANT: Every connection in "connections" array must have SPECIFIC, REAL pin 
       ];
     } else if (action === 'fix_code') {
       // Fix code based on user's problem description
-      const { currentCode, problemDescription, deviceType, language: lang = 'en' } = await req.json();
+      const { currentCode, problemDescription, deviceType, language: lang = 'en' } = body;
       
       const languageInstruction = lang !== 'en' 
         ? `IMPORTANT: Respond with all text content (analysis, explanation, tips) in ${lang} language. Keep code and technical terms in English.` 
