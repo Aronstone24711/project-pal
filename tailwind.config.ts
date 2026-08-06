@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ["Outfit", "system-ui", "sans-serif"],
+        sans: ["JetBrains Mono", "ui-monospace", "monospace"],
         display: ["Outfit", "system-ui", "sans-serif"],
         mono: ["JetBrains Mono", "monospace"],
       },
