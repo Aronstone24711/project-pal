@@ -124,16 +124,14 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     // Remove all theme classes
     root.classList.remove('theme-sunny', 'theme-cloudy', 'theme-rainy', 'theme-cold', 'theme-morning', 'theme-evening', 'theme-night');
     
-    // Add current theme class
-    root.classList.add(`theme-${theme}`);
-    
-    // Toggle dark mode for night theme
-    if (theme === 'night' || theme === 'evening') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
+    // Only tint once we actually have weather; otherwise keep the base terminal palette
+    if (weatherData) {
+      root.classList.add(`theme-${theme}`);
     }
-  }, [theme]);
+
+    // The app shell is always dark (terminal aesthetic); weather themes only re-tint it
+    root.classList.add('dark');
+  }, [theme, weatherData]);
 
   return (
     <ThemeContext.Provider
