@@ -162,7 +162,7 @@ const Index = () => {
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center overflow-hidden sunny-glow">
-                <img src={searchAllLogo} alt="Search All Logo" className="w-full h-full object-contain mix-blend-multiply dark:mix-blend-screen" />
+                <img src={searchAllLogo} alt="Search All Logo" className="w-full h-full object-contain mix-blend-screen" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-foreground">Search All</h1>
