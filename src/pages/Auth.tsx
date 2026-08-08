@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { useDocumentHead } from "@/hooks/useDocumentHead";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -137,11 +137,6 @@ const Auth = ({ mode: initialMode }: AuthPageProps) => {
 
   return (
     <>
-      <Helmet>
-        <title>{mode === "login" ? "Login" : "Sign Up"} | Search All</title>
-        <meta name="description" content={mode === "login" ? "Login to your Search All account" : "Create a new Search All account"} />
-      </Helmet>
-      
       <div className="min-h-screen bg-background starry-bg flex items-center justify-center px-4">
         <Card className="w-full max-w-md">
           <CardHeader className="space-y-1">
