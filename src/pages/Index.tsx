@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Helmet } from "react-helmet";
+import { useDocumentHead } from "@/hooks/useDocumentHead";
 import WelcomePage from "@/components/WelcomePage";
 import LanguageSelector from "@/components/LanguageSelector";
 import AgeSelector from "@/components/AgeSelector";
@@ -40,6 +40,11 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { weatherData } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  useDocumentHead(
+    "Search All | Scan Items & Discover Projects",
+    "Scan any items - electronics, paper, household objects - and get AI-powered project suggestions with step-by-step visual instructions."
+  );
 
   const handleWelcomeContinue = () => {
     setState("location");
@@ -152,11 +157,6 @@ const Index = () => {
 
   return (
     <>
-      <Helmet>
-        <title>Search All | Scan Items & Discover Projects</title>
-        <meta name="description" content="Scan any items - electronics, paper, household objects - and get AI-powered project suggestions with step-by-step visual instructions." />
-      </Helmet>
-      
       <div className="min-h-screen bg-background starry-bg">
         <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
@@ -200,7 +200,11 @@ const Index = () => {
 
         <main className="container mx-auto px-4 py-6 pb-24">
           {state === "welcome" && (
-            <WelcomePage onContinue={handleWelcomeContinue} onDebug={handleDebugClick} />
+            <WelcomePage
+              onContinue={handleWelcomeContinue}
+              onDebug={handleDebugClick}
+              language={language?.code || "en"}
+            />
           )}
 
           {state === "debug" && (
