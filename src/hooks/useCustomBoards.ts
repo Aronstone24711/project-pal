@@ -35,17 +35,36 @@ const read = (): CustomBoard[] => {
   }
 };
 
+// Shared store so every component using this hook stays in sync
+const listeners = new Set<(boards: CustomBoard[]) => void>();
+
+const write = (next: CustomBoard[]) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+  } catch {
+    // ignore quota errors
+  }
+  listeners.forEach((l) => l(next));
+};
+
 export const useCustomBoards = () => {
   const [boards, setBoards] = useState<CustomBoard[]>([]);
 
   useEffect(() => {
     setBoards(read());
+    const listener = (next: CustomBoard[]) => setBoards(next);
+    listeners.add(listener);
+    const onStorage = (e: StorageEvent) => {
+      if (e.key === STORAGE_KEY) setBoards(read());
+    };
+    window.addEventListener("storage", onStorage);
+    return () => {
+      listeners.delete(listener);
+      window.removeEventListener("storage", onStorage);
+    };
   }, []);
 
-  const persist = useCallback((next: CustomBoard[]) => {
-    setBoards(next);
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
-  }, []);
+  const persist = useCallback((next: CustomBoard[]) => write(next), []);
 
   const addBoard = useCallback(
     (board: Omit<CustomBoard, "id" | "createdAt">) => {
@@ -54,6 +73,7 @@ export const useCustomBoards = () => {
         ...read().filter((b) => b.name.toLowerCase() !== board.name.toLowerCase()),
       ];
       persist(next);
+      return next;
     },
     [persist]
   );
