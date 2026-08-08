@@ -271,6 +271,39 @@ My problem: ${problemDescription}
 Please analyze and fix the code.`
         }
       ];
+    } else if (action === 'board_info') {
+      const { boardName, language: lang = 'en' } = body;
+      const languageInstruction = lang !== 'en'
+        ? `Write all descriptive text in ${lang} language. Keep pin names, board names and technical identifiers in English.`
+        : '';
+
+      messages = [
+        {
+          role: "system",
+          content: `You are an expert in microcontrollers and single-board computers. Given a board name, return accurate, verified technical facts about it. Never invent pins or specs. If the board is unknown, say so in "notes".
+${languageInstruction}
+Return JSON with this exact structure:
+{
+  "name": "Canonical board name",
+  "family": "e.g. Arduino, ESP, Raspberry Pi, STM32, Other",
+  "mcu": "Microcontroller / SoC",
+  "logicVoltage": "e.g. 3.3V",
+  "digitalPins": "count or description",
+  "analogPins": "count or description",
+  "pwmPins": "count or description",
+  "communication": ["I2C pins", "SPI pins", "UART pins"],
+  "programmingEnv": "e.g. Arduino IDE, PlatformIO, MicroPython",
+  "capabilities": ["WiFi", "Bluetooth", "..."],
+  "commonUses": ["..."],
+  "cautions": ["Voltage or pin cautions"],
+  "notes": "Short summary"
+}`
+        },
+        {
+          role: "user",
+          content: `Board: ${boardName}. Provide accurate specifications.`
+        }
+      ];
     }
 
     console.log(`Processing ${action} request...`);
