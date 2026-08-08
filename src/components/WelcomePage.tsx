@@ -10,11 +10,12 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 interface WelcomePageProps {
   onContinue: () => void;
   onDebug: () => void;
+  language?: string;
 }
 
 const boards = ["Arduino", "ESP32", "Raspberry Pi", "STM32"];
 
-const WelcomePage = ({ onContinue, onDebug }: WelcomePageProps) => {
+const WelcomePage = ({ onContinue, onDebug, language = "en" }: WelcomePageProps) => {
   const { boards: customBoards, removeBoard } = useCustomBoards();
   const online = useOnlineStatus();
   const [addBoardOpen, setAddBoardOpen] = useState(false);
@@ -64,10 +65,15 @@ const WelcomePage = ({ onContinue, onDebug }: WelcomePageProps) => {
 
         <ul className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-4">
           {boards.map((board) => (
-            <li key={board} className="rounded-lg border border-border bg-card p-4">
-              <Cpu className="w-5 h-5 text-primary" />
-              <p className="mt-3 font-display font-semibold">{board}</p>
-              <p className="text-xs text-muted-foreground mt-1">Wiring + code</p>
+            <li key={board}>
+              <button
+                onClick={onContinue}
+                className="w-full h-full min-h-[104px] text-left rounded-lg border border-border bg-card p-4 hover:border-primary transition-colors"
+              >
+                <Cpu className="w-5 h-5 text-primary" />
+                <p className="mt-3 font-display font-semibold">{board}</p>
+                <p className="text-xs text-muted-foreground mt-1">Wiring + code</p>
+              </button>
             </li>
           ))}
 
@@ -117,7 +123,7 @@ const WelcomePage = ({ onContinue, onDebug }: WelcomePageProps) => {
 
       <CustomProjects />
 
-      <AddBoardDialog open={addBoardOpen} onOpenChange={setAddBoardOpen} />
+      <AddBoardDialog open={addBoardOpen} onOpenChange={setAddBoardOpen} language={language} />
     </div>
   );
 };
