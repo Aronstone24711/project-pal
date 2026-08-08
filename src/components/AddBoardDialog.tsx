@@ -97,6 +97,11 @@ const AddBoardDialog = ({ open, onOpenChange, language = "en" }: AddBoardDialogP
               {loading ? "Fetching specs…" : "Add board"}
             </Button>
           </DialogFooter>
+          {loading && (
+            <p className="text-xs text-muted-foreground text-center">
+              Looking up the datasheet — this can take up to 30 seconds.
+            </p>
+          )}
         </form>
       </DialogContent>
     </Dialog>

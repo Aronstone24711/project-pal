@@ -9,7 +9,7 @@ export interface BoardDetails {
   analogPins?: string;
   pwmPins?: string;
   communication?: string[];
-  programmingEnv?: string;
+  programmingEnv?: string | string[];
   capabilities?: string[];
   commonUses?: string[];
   cautions?: string[];
