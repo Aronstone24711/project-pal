@@ -135,6 +135,11 @@ const Auth = ({ mode: initialMode }: AuthPageProps) => {
     }
   };
 
+  useDocumentHead(
+    `${mode === "login" ? "Login" : "Sign Up"} | Search All`,
+    mode === "login" ? "Login to your Search All account" : "Create a new Search All account"
+  );
+
   return (
     <>
       <div className="min-h-screen bg-background starry-bg flex items-center justify-center px-4">
