@@ -187,6 +187,11 @@ const ProjectInstructions = ({ project, components, onBack, language, englishLev
           <ArrowLeft className="w-4 h-4" />
           Back to Projects
         </Button>
+        {(fromCache || !online) && (
+          <Badge variant="secondary" className="text-[10px]">
+            {online ? "saved copy · works offline" : "offline · saved copy"}
+          </Badge>
+        )}
       </div>
 
       <div className="space-y-2">
