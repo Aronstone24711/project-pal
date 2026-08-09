@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import searchAllLogo from "@/assets/searchall-logo.png";
 import { Wrench, ScanLine, ArrowRight, Cpu, Plus, Trash2, Wifi, WifiOff } from "lucide-react";
-import CustomProjects from "@/components/CustomProjects";
+import MyWorkspace from "@/components/MyWorkspace";
 import AddBoardDialog from "@/components/AddBoardDialog";
 import { useCustomBoards } from "@/hooks/useCustomBoards";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
@@ -11,11 +11,12 @@ interface WelcomePageProps {
   onContinue: () => void;
   onDebug: () => void;
   language?: string;
+  englishLevel?: string;
 }
 
 const boards = ["Arduino", "ESP32", "Raspberry Pi", "STM32"];
 
-const WelcomePage = ({ onContinue, onDebug, language = "en" }: WelcomePageProps) => {
+const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "easy" }: WelcomePageProps) => {
   const { boards: customBoards, removeBoard } = useCustomBoards();
   const online = useOnlineStatus();
   const [addBoardOpen, setAddBoardOpen] = useState(false);
@@ -68,7 +69,7 @@ const WelcomePage = ({ onContinue, onDebug, language = "en" }: WelcomePageProps)
             <li key={board}>
               <button
                 onClick={onContinue}
-                className="w-full h-full min-h-[104px] text-left rounded-lg border border-border bg-card p-4 hover:border-primary transition-colors"
+              className="w-full h-full min-h-[104px] text-left rounded-lg glass p-4 hover:border-primary transition-colors"
               >
                 <Cpu className="w-5 h-5 text-primary" />
                 <p className="mt-3 font-display font-semibold">{board}</p>
@@ -78,7 +79,7 @@ const WelcomePage = ({ onContinue, onDebug, language = "en" }: WelcomePageProps)
           ))}
 
           {customBoards.map((board) => (
-            <li key={board.id} className="rounded-lg border border-border bg-card p-4 relative">
+            <li key={board.id} className="rounded-lg glass p-4 relative">
               <div className="flex items-start justify-between gap-2">
                 <Cpu className="w-5 h-5 text-primary" />
                 <button
@@ -121,7 +122,7 @@ const WelcomePage = ({ onContinue, onDebug, language = "en" }: WelcomePageProps)
         </div>
       </section>
 
-      <CustomProjects />
+      <MyWorkspace language={language} englishLevel={englishLevel} />
 
       <AddBoardDialog open={addBoardOpen} onOpenChange={setAddBoardOpen} language={language} />
     </div>
