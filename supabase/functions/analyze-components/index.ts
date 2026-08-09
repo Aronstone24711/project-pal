@@ -74,7 +74,7 @@ Be thorough and identify EVERYTHING you can see - paper, pencils, used pens, car
         : '';
       
       const complexityInstruction = englishLevel === 'easy' 
-        ? 'Use very simple, short sentences. Avoid technical jargon. Write as if explaining to an 8-year-old child.'
+        ? 'WRITE IN VERY EASY ENGLISH. Use only common everyday words. Sentences must be under 12 words. Never use jargon: say "power wire" not "VCC", "signal wire" not "data line", "board" not "microcontroller". If a technical word is unavoidable, put a plain-words meaning in brackets right after it. Write as if explaining to an 8-year-old.'
         : englishLevel === 'hard'
         ? 'Use technical terminology and detailed explanations suitable for experienced makers and engineers.'
         : 'Use clear, standard vocabulary with straightforward explanations.';
@@ -131,7 +131,13 @@ Suggest 5-8 diverse projects ranging from simple to complex. Be creative! For ad
         : '';
       
       const complexityInstruction = englishLevel === 'easy' 
-        ? 'CRITICAL: Use very simple words and short sentences. Explain everything as if teaching an 8-year-old child. Avoid all technical jargon - use everyday words instead.'
+        ? `CRITICAL - EASY MODE. Follow all of these:
+- Only common everyday words. Sentences under 12 words. One idea per sentence.
+- No jargon. Say "power wire (+)" not "VCC", "ground wire (-)" not "GND rail", "board" not "MCU", "little chip that measures heat" not "temperature sensor IC".
+- Any technical word that must stay (pin names, library names) gets a plain-words meaning in brackets right after it, e.g. "pin 9 (the hole marked 9 on the board)".
+- Every step: say exactly what to hold, where to push it, and what it should look like after.
+- Code comments must also be in very easy words, one comment per line of code.
+- Never assume the reader knows electronics. Explain as if teaching an 8-year-old.`
         : englishLevel === 'hard'
         ? 'Use technical terminology freely. Include detailed explanations of why each step is necessary. Suitable for experienced makers.'
         : 'Use clear, standard vocabulary. Explain terms when first used. Balance between accessibility and accuracy.';
@@ -303,6 +309,70 @@ Return JSON with this exact structure:
           role: "user",
           content: `Board: ${boardName}. Provide accurate specifications.`
         }
+      ];
+    } else if (action === 'custom_project') {
+      // User's own idea -> full personalised build plan
+      const { idea, device, ownComponents, language: lang = 'en', englishLevel: level = 'easy', imageBase64: ideaImage } = body;
+
+      const languageInstruction = lang !== 'en'
+        ? `Respond with all text in ${lang} language. Keep code, pin names and library names in English.`
+        : '';
+
+      const complexityInstruction = level === 'easy'
+        ? `EASY MODE: only everyday words, sentences under 12 words, no jargon, plain-words meaning in brackets for any technical term, comment every line of code in simple words.`
+        : level === 'hard'
+          ? 'Use full engineering terminology and datasheet-level detail.'
+          : 'Use clear standard language and explain each technical term once.';
+
+      const userContent: any[] = [
+        {
+          type: "text",
+          text: `My own project idea: ${idea}
+Board / device I want to use: ${device || 'suggest the best one I likely have'}
+Parts I already have: ${ownComponents || 'not listed - assume common beginner parts and tell me what to buy'}
+
+Turn my idea into a complete, correct build plan I can actually finish.`
+        }
+      ];
+      if (ideaImage) {
+        userContent.push({ type: "image_url", image_url: { url: ideaImage } });
+      }
+
+      messages = [
+        {
+          role: "system",
+          content: `You are a professional embedded-systems engineer turning a maker's own idea into a real, buildable project. Accuracy is non-negotiable.
+
+${languageInstruction}
+${complexityInstruction}
+
+RULES:
+- Real pins only (Arduino Uno: D0-D13, A0-A5, A4=SDA, A5=SCL; ESP32: GPIO0-39, GPIO21=SDA, GPIO22=SCL). Never invent pins.
+- LEDs always get a current-limiting resistor (220Ω-330Ω). Every circuit has a complete GND path.
+- Code must compile: all #include lines, correct syntax, pin numbers matching the wiring exactly.
+- If the idea is impossible as described, keep the spirit of it and build the closest achievable version, and say so in the overview.
+
+Return JSON with this exact structure:
+{
+  "project": {
+    "name": "Project Name",
+    "overview": "What it does and how it matches the user's idea",
+    "components": [{ "name": "Part", "quantity": 1, "notes": "exact spec" }],
+    "steps": [{
+      "stepNumber": 1,
+      "title": "Step title",
+      "description": "Very detailed physical instructions with exact pins",
+      "connections": [{ "from": "Arduino Pin 9", "to": "220Ω resistor -> LED anode", "wireColor": "red" }],
+      "tips": ["tip"],
+      "imageDescription": "What it should look like at this stage"
+    }],
+    "code": { "filename": "my_project.ino", "code": "// complete code", "explanation": "what the code does" },
+    "testing": ["how to confirm it works"],
+    "troubleshooting": [{ "problem": "...", "solution": "numbered fixes" }]
+  }
+}`
+        },
+        { role: "user", content: userContent }
       ];
     }
 

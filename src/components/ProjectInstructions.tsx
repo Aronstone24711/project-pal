@@ -23,6 +23,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Component, Project, ProjectInstructions as ProjectInstructionsType, InstructionStep } from "@/types/arduino";
 import CodeFixDialog from "./CodeFixDialog";
 import { EnglishLevel } from "./EnglishLevelSelector";
+import {
+  instructionCacheKey,
+  readCachedInstructions,
+  writeCachedInstructions,
+} from "@/hooks/useInstructionCache";
+import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
 interface ProjectInstructionsProps {
   project: Project;
@@ -40,12 +46,36 @@ const ProjectInstructions = ({ project, components, onBack, language, englishLev
   const [copied, setCopied] = useState(false);
   const [currentCode, setCurrentCode] = useState<string>("");
   const { toast } = useToast();
+  const online = useOnlineStatus();
+  const [fromCache, setFromCache] = useState(false);
 
   useEffect(() => {
     fetchInstructions();
   }, [project]);
 
   const fetchInstructions = async () => {
+    const cacheKey = instructionCacheKey(project.name, language, englishLevel);
+    const cached = readCachedInstructions(cacheKey);
+
+    // Offline (or cached already): serve the saved copy instantly.
+    if (cached) {
+      setInstructions(cached);
+      setCurrentCode(cached.project.code?.code || "");
+      setFromCache(true);
+      setIsLoading(false);
+      if (!navigator.onLine) return;
+    }
+
+    if (!navigator.onLine) {
+      setIsLoading(false);
+      toast({
+        title: "You are offline",
+        description: "This project has not been saved for offline use yet.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsLoading(true);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-components", {
@@ -63,8 +93,11 @@ const ProjectInstructions = ({ project, components, onBack, language, englishLev
       if (data.project) {
         setInstructions(data);
         setCurrentCode(data.project.code?.code || "");
+        setFromCache(false);
+        writeCachedInstructions(cacheKey, data);
       }
     } catch (error: any) {
+      if (cached) return;
       toast({
         title: "Failed to Load Instructions",
         description: error.message || "Please try again.",
@@ -154,6 +187,11 @@ const ProjectInstructions = ({ project, components, onBack, language, englishLev
           <ArrowLeft className="w-4 h-4" />
           Back to Projects
         </Button>
+        {(fromCache || !online) && (
+          <Badge variant="secondary" className="text-[10px]">
+            {online ? "saved copy · works offline" : "offline · saved copy"}
+          </Badge>
+        )}
       </div>
 
       <div className="space-y-2">
