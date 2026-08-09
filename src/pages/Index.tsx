@@ -1,22 +1,33 @@
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDocumentHead } from "@/hooks/useDocumentHead";
 import WelcomePage from "@/components/WelcomePage";
-import LanguageSelector from "@/components/LanguageSelector";
 import AgeSelector from "@/components/AgeSelector";
 import EnglishLevelSelector, { EnglishLevel } from "@/components/EnglishLevelSelector";
-import CameraScanner from "@/components/CameraScanner";
-import ComponentsList from "@/components/ComponentsList";
-import ProjectSuggestions from "@/components/ProjectSuggestions";
-import ProjectInstructions from "@/components/ProjectInstructions";
 import HeaderMenu from "@/components/HeaderMenu";
 import LocationSelector from "@/components/LocationSelector";
 import WeatherDisplay from "@/components/WeatherDisplay";
 import SettingsDialog from "@/components/SettingsDialog";
-import DebugProject from "@/components/DebugProject";
+import WeatherBackdrop from "@/components/WeatherBackdrop";
+import AssistantChat from "@/components/AssistantChat";
 import { useTheme } from "@/contexts/ThemeContext";
 import searchAllLogo from "@/assets/searchall-logo.png";
 import { Component, Project } from "@/types/arduino";
+import { Loader2 } from "lucide-react";
+
+// Heavy, step-specific screens load only when the user reaches them.
+const LanguageSelector = lazy(() => import("@/components/LanguageSelector"));
+const CameraScanner = lazy(() => import("@/components/CameraScanner"));
+const ComponentsList = lazy(() => import("@/components/ComponentsList"));
+const ProjectSuggestions = lazy(() => import("@/components/ProjectSuggestions"));
+const ProjectInstructions = lazy(() => import("@/components/ProjectInstructions"));
+const DebugProject = lazy(() => import("@/components/DebugProject"));
+
+const ScreenFallback = () => (
+  <div className="flex items-center justify-center py-24 text-muted-foreground">
+    <Loader2 className="w-6 h-6 animate-spin" />
+  </div>
+);
 
 interface Language {
   code: string;
@@ -157,8 +168,9 @@ const Index = () => {
 
   return (
     <>
-      <div className="min-h-screen bg-background starry-bg">
-        <header className="border-b border-border/40 bg-card/50 backdrop-blur-sm sticky top-0 z-50">
+      <WeatherBackdrop />
+      <div className="min-h-screen bg-transparent">
+        <header className="border-b border-border/40 glass sticky top-0 z-40 rounded-none">
           <div className="container mx-auto px-4 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-background flex items-center justify-center overflow-hidden sunny-glow">
@@ -199,11 +211,13 @@ const Index = () => {
         </header>
 
         <main className="container mx-auto px-4 py-6 pb-24">
+          <Suspense fallback={<ScreenFallback />}>
           {state === "welcome" && (
             <WelcomePage
               onContinue={handleWelcomeContinue}
               onDebug={handleDebugClick}
               language={language?.code || "en"}
+              englishLevel={englishLevel}
             />
           )}
 
@@ -260,11 +274,26 @@ const Index = () => {
               englishLevel={englishLevel}
             />
           )}
+          </Suspense>
         </main>
 
-        <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-sm text-muted-foreground bg-background/80 backdrop-blur-sm border-t border-border/40">
+        <footer className="fixed bottom-0 left-0 right-0 py-4 text-center text-sm text-muted-foreground glass border-t border-border/40 rounded-none z-30">
           Created by Leeroy Bansal
         </footer>
+
+        <AssistantChat
+          language={language?.code || "en"}
+          englishLevel={englishLevel}
+          context={
+            selectedProject
+              ? `Project: ${selectedProject.name} — ${selectedProject.description}. Parts available: ${components
+                  .map((c) => c.name)
+                  .join(", ")}`
+              : components.length > 0
+                ? `Parts the user has: ${components.map((c) => c.name).join(", ")}`
+                : undefined
+          }
+        />
 
         <SettingsDialog
           open={settingsOpen}
