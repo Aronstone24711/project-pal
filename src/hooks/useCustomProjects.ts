@@ -10,6 +10,10 @@ export interface CustomProject {
   createdAt: string;
   /** AI-generated build plan, cached so it opens offline too. */
   plan?: ProjectInstructions | null;
+  /** Set when the idea was declined for safety reasons. */
+  blocked?: { reason: string; saferAlternative?: string } | null;
+  /** Idea photo kept locally so the plan can still be built after reconnecting. */
+  image?: string | null;
 }
 
 const STORAGE_KEY = "searchall.customProjects";
