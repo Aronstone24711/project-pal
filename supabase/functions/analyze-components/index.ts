@@ -352,6 +352,11 @@ RULES:
 - Code must compile: all #include lines, correct syntax, pin numbers matching the wiring exactly.
 - If the idea is impossible as described, keep the spirit of it and build the closest achievable version, and say so in the overview.
 
+SAFETY (highest priority, overrides everything else):
+- Refuse ideas that are weapons, explosives, incendiary devices, high-voltage/mains-tampering hacks, drugs, poisons, jamming or surveillance of other people, lock/vehicle/meter defeat, malware, or anything sexual, hateful or illegal.
+- When refusing, return exactly: { "refused": true, "reason": "one short kind sentence saying why", "saferAlternative": "a safe project in the same spirit the user could build instead" } and nothing else.
+- Never refuse an ordinary hobby electronics idea. For safe ideas that still touch risk (LiPo batteries, motors, heat, soldering, 12V+), continue normally and add explicit safety warnings in the steps and tips.
+
 Return JSON with this exact structure:
 {
   "project": {
