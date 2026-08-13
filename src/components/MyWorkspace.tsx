@@ -271,7 +271,13 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
                   </span>
                 )}
                 <Badge variant={project.plan ? "default" : "secondary"} className="text-[10px]">
-                  {project.plan ? "plan ready · offline" : "idea saved"}
+                  {project.blocked
+                    ? "not supported"
+                    : project.plan
+                      ? "plan ready · offline"
+                      : online
+                        ? "building"
+                        : "queued · offline"}
                 </Badge>
               </div>
 
@@ -282,8 +288,24 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
                 <p className="mt-3 text-xs text-muted-foreground/80 font-mono">{project.components}</p>
               )}
 
+              {project.blocked && (
+                <div className="mt-3 rounded border border-destructive/40 bg-destructive/10 p-3">
+                  <p className="flex items-center gap-2 text-xs font-semibold text-destructive">
+                    <ShieldAlert className="w-3.5 h-3.5" /> Can't help with this one
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{project.blocked.reason}</p>
+                  {project.blocked.saferAlternative && (
+                    <p className="mt-2 text-xs text-foreground">Try instead: {project.blocked.saferAlternative}</p>
+                  )}
+                </div>
+              )}
+
               <div className="mt-4 flex gap-2">
-                {project.plan ? (
+                {project.blocked ? (
+                  <Button size="sm" variant="outline" className="gap-1.5" onClick={() => removeProject(project.id)}>
+                    <Trash2 className="w-3.5 h-3.5" /> Remove idea
+                  </Button>
+                ) : project.plan ? (
                   <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setOpenProject(project)}>
                     <BookOpen className="w-3.5 h-3.5" /> Open plan
                   </Button>
