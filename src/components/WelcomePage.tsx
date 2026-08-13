@@ -23,8 +23,6 @@ const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "eas
 
   return (
     <div className="relative">
-      <div className="absolute inset-0 -z-10 grid-backdrop" aria-hidden="true" />
-
       <section className="max-w-5xl mx-auto pt-10 md:pt-16">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2">
