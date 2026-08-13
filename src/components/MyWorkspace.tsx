@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,9 +23,12 @@ import {
   BookOpen,
   Copy,
   Check,
+  ShieldAlert,
+  RefreshCw,
 } from "lucide-react";
 import { useCustomProjects, CustomProject } from "@/hooks/useCustomProjects";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
+import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -72,14 +75,36 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
           ownComponents: project.components,
           language,
           englishLevel,
-          imageBase64: ideaImage || undefined,
+          imageBase64: ideaImage ?? project.image ?? undefined,
         },
       });
       if (error) throw error;
+      if (data?.refused) {
+        updateProject(project.id, {
+          plan: null,
+          image: null,
+          blocked: { reason: data.reason || "This idea can't be built safely.", saferAlternative: data.saferAlternative },
+        });
+        toast({
+          title: "Idea not supported",
+          description: data.reason || "This idea isn't something we can help build.",
+          variant: "destructive",
+        });
+        return;
+      }
       if (!data?.project) throw new Error("The plan came back empty. Please try again.");
-      updateProject(project.id, { plan: data, name: data.project.name || project.name });
+      updateProject(project.id, {
+        plan: data,
+        blocked: null,
+        image: null,
+        name: data.project.name || project.name,
+      });
       toast({ title: "Build plan ready", description: "Saved to your workspace — it opens offline too." });
     } catch (err) {
+      if (!navigator.onLine) {
+        toast({ title: "Connection lost", description: "Queued — it will build itself when you're back online." });
+        return;
+      }
       toast({
         title: "Could not build the plan",
         description: err instanceof Error ? err.message : "Please try again.",
@@ -89,6 +114,15 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
       setBusyId(null);
     }
   };
+
+  // Anything saved offline (or failed mid-request) is queued and drained on reconnect.
+  const queued = useMemo(
+    () => projects.filter((p) => !p.plan && !p.blocked && (p.description || p.name)),
+    [projects]
+  );
+  const { syncing } = useOfflineSync(queued, (project) =>
+    generatePlan(project, project.description || project.name)
+  );
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,6 +134,8 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
       device: device.trim(),
       components: components.trim(),
       plan: null,
+      blocked: null,
+      image: online ? null : image,
     });
     const ideaText = idea.trim() || name.trim();
     const ideaImage = image;
@@ -115,7 +151,7 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
     } else if (!online) {
       toast({
         title: "Saved offline",
-        description: "Your idea is stored. Reconnect and press Build plan.",
+        description: "Your idea is stored and builds itself the moment you're back online.",
       });
     }
   };
@@ -137,6 +173,14 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
           Upload your own idea — a sentence, or a photo of a sketch — and get a full personalised
           build plan with wiring, steps and code. Everything stays on this device and opens offline.
         </p>
+        {(syncing || (!online && queued.length > 0)) && (
+          <p className="mt-3 inline-flex items-center gap-2 text-xs font-mono text-primary">
+            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? "animate-spin" : ""}`} />
+            {syncing
+              ? `syncing ${queued.length} queued idea${queued.length === 1 ? "" : "s"}…`
+              : `${queued.length} idea${queued.length === 1 ? "" : "s"} waiting for network`}
+          </p>
+        )}
       </div>
 
       <form onSubmit={handleCreate} className="mt-6 glass rounded-lg p-5 space-y-4">
@@ -227,7 +271,13 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
                   </span>
                 )}
                 <Badge variant={project.plan ? "default" : "secondary"} className="text-[10px]">
-                  {project.plan ? "plan ready · offline" : "idea saved"}
+                  {project.blocked
+                    ? "not supported"
+                    : project.plan
+                      ? "plan ready · offline"
+                      : online
+                        ? "building"
+                        : "queued · offline"}
                 </Badge>
               </div>
 
@@ -238,8 +288,24 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
                 <p className="mt-3 text-xs text-muted-foreground/80 font-mono">{project.components}</p>
               )}
 
+              {project.blocked && (
+                <div className="mt-3 rounded border border-destructive/40 bg-destructive/10 p-3">
+                  <p className="flex items-center gap-2 text-xs font-semibold text-destructive">
+                    <ShieldAlert className="w-3.5 h-3.5" /> Can't help with this one
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">{project.blocked.reason}</p>
+                  {project.blocked.saferAlternative && (
+                    <p className="mt-2 text-xs text-foreground">Try instead: {project.blocked.saferAlternative}</p>
+                  )}
+                </div>
+              )}
+
               <div className="mt-4 flex gap-2">
-                {project.plan ? (
+                {project.blocked ? (
+                  <Button size="sm" variant="outline" className="gap-1.5" onClick={() => removeProject(project.id)}>
+                    <Trash2 className="w-3.5 h-3.5" /> Remove idea
+                  </Button>
+                ) : project.plan ? (
                   <Button size="sm" variant="outline" className="gap-1.5" onClick={() => setOpenProject(project)}>
                     <BookOpen className="w-3.5 h-3.5" /> Open plan
                   </Button>
