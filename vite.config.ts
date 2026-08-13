@@ -15,6 +15,9 @@ export default defineConfig(({ mode }) => ({
     mode === "development" && componentTagger(),
     VitePWA({
       registerType: "autoUpdate",
+      filename: "sw.js",
+      injectRegister: null,
+      devOptions: { enabled: false },
       includeAssets: ["favicon.ico", "robots.txt"],
       manifest: {
         name: "Search All",
@@ -46,9 +49,36 @@ export default defineConfig(({ mode }) => ({
         ],
       },
       workbox: {
+        clientsClaim: true,
+        skipWaiting: true,
         navigateFallbackDenylist: [/^\/~oauth/],
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
         runtimeCaching: [
+          {
+            // HTML navigations: always try the network first, fall back to cache offline.
+            urlPattern: ({ request }) => request.mode === "navigate",
+            handler: "NetworkFirst",
+            options: {
+              cacheName: "html-navigations",
+              networkTimeoutSeconds: 4,
+              expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 7 },
+            },
+          },
+          {
+            // Same-origin hashed build assets are immutable.
+            urlPattern: ({ url, request, sameOrigin }) =>
+              sameOrigin && /\/assets\//.test(url.pathname) && ["script", "style", "font", "image"].includes(request.destination),
+            handler: "CacheFirst",
+            options: {
+              cacheName: "build-assets",
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+          {
+            // Never cache backend/AI calls — offline data comes from local storage instead.
+            urlPattern: ({ url }) => url.hostname.endsWith(".supabase.co"),
+            handler: "NetworkOnly",
+          },
           {
             urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
             handler: "CacheFirst",
