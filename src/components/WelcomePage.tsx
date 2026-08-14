@@ -4,6 +4,9 @@ import searchAllLogo from "@/assets/searchall-logo.png";
 import { Wrench, ScanLine, ArrowRight, Cpu, Plus, Trash2, Wifi, WifiOff } from "lucide-react";
 import MyWorkspace from "@/components/MyWorkspace";
 import AddBoardDialog from "@/components/AddBoardDialog";
+import HowItWorks from "@/components/home/HowItWorks";
+import FeatureGrid from "@/components/home/FeatureGrid";
+import HomeFaq from "@/components/home/HomeFaq";
 import { useCustomBoards } from "@/hooks/useCustomBoards";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
@@ -121,6 +124,33 @@ const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "eas
       </section>
 
       <MyWorkspace language={language} englishLevel={englishLevel} />
+
+      <HowItWorks />
+
+      <FeatureGrid />
+
+      <HomeFaq />
+
+      <section className="max-w-5xl mx-auto pt-20">
+        <div className="rounded-lg glass-strong p-8 md:p-10 text-center">
+          <p className="terminal-label">// ready when you are</p>
+          <h2 className="mt-3 font-display text-2xl md:text-3xl font-bold">
+            Grab your parts and start the first build
+          </h2>
+          <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto">
+            Scanning takes a few seconds, and everything you generate stays available on this device —
+            even with the Wi-Fi off.
+          </p>
+          <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+            <Button size="lg" onClick={onContinue} className="gap-2">
+              <ScanLine className="w-5 h-5" /> Start building <ArrowRight className="w-4 h-4" />
+            </Button>
+            <Button size="lg" variant="outline" onClick={onDebug} className="gap-2">
+              <Wrench className="w-5 h-5" /> Debug a project
+            </Button>
+          </div>
+        </div>
+      </section>
 
       <AddBoardDialog open={addBoardOpen} onOpenChange={setAddBoardOpen} language={language} />
     </div>
