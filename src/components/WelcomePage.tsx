@@ -123,11 +123,11 @@ const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "eas
         </div>
       </section>
 
-      <MyWorkspace language={language} englishLevel={englishLevel} />
-
       <HowItWorks />
 
       <FeatureGrid />
+
+      <MyWorkspace language={language} englishLevel={englishLevel} />
 
       <HomeFaq />
 
