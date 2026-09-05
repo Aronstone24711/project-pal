@@ -1,0 +1,4 @@
+- [ ] Reduce initial home-page work without changing the user flow
+- [ ] Add bounded, offline-aware request handling for weather, AI, and assistant actions
+- [ ] Harden edge-function input validation and safe response handling
+- [ ] Verify build and live preview behavior
