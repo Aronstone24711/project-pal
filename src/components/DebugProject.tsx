@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import SafetyNotice from "@/components/SafetyNotice";
 
 interface DebugProjectProps {
   language: string;
@@ -126,6 +127,8 @@ const DebugProject = ({ language, onBack }: DebugProjectProps) => {
         <h2 className="text-2xl font-bold text-foreground mb-1">Debug a Project</h2>
         <p className="text-muted-foreground">Paste your code, describe the issue, and get an AI-powered fix.</p>
       </div>
+
+      <SafetyNotice />
 
       {!result ? (
         <Card>

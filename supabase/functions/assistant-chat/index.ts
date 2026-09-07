@@ -1,4 +1,5 @@
 import { corsHeaders } from 'npm:@supabase/supabase-js@2/cors';
+import { checkSafety, refusalPayload, safeLanguage, safeString } from '../_shared/safety.ts';
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -19,18 +20,31 @@ Deno.serve(async (req) => {
       });
     }
 
-    const body = await req.json();
-    const messages: ChatMessage[] = Array.isArray(body?.messages) ? body.messages.slice(-20) : [];
-    if (messages.length === 0) {
-      return new Response(JSON.stringify({ error: "messages is required" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    const body = await req.json().catch(() => null);
+    const rawMessages = Array.isArray(body?.messages) ? body.messages.slice(-20) : [];
+    if (rawMessages.length === 0 || rawMessages.length > 20) {
+      return new Response(JSON.stringify({ error: "messages is required" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const messages: ChatMessage[] = rawMessages.map((message: unknown) => {
+      if (!message || typeof message !== 'object') throw new Error('Invalid message');
+      const record = message as Record<string, unknown>;
+      const role = record.role === 'assistant' ? 'assistant' : record.role === 'user' ? 'user' : null;
+      const content = safeString(record.content, 6_000);
+      if (!role || !content) throw new Error('Invalid message');
+      return { role, content };
+    });
+    const latestUserText = messages.filter((message) => message.role === 'user').map((message) => message.content).join('\n');
+    const safety = checkSafety(latestUserText);
+    if (safety.blocked) {
+      return new Response(JSON.stringify(refusalPayload(safety)), { status: 422, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    if (messages.reduce((total, message) => total + message.content.length, 0) > 24_000) {
+      return new Response(JSON.stringify({ error: "Please shorten the conversation and try again." }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const language: string = body?.language || "en";
-    const englishLevel: string = body?.englishLevel || "easy";
-    const context: string = typeof body?.context === "string" ? body.context.slice(0, 4000) : "";
+    const language = safeLanguage(body?.language);
+    const englishLevel = ["easy", "medium", "hard"].includes(body?.englishLevel) ? body.englishLevel : "easy";
+    const context = typeof body?.context === "string" ? body.context.slice(0, 4000) : "";
 
     const levelRule =
       englishLevel === "easy"
@@ -63,30 +77,36 @@ Safety rules that never bend: LEDs always get a current-limiting resistor; every
 If the user just chats or asks a short question, answer briefly without forcing the full template.
 ${context ? `\nCurrent project context the user is looking at:\n${context}` : ""}`;
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 55_000);
     const upstream = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         "Lovable-API-Key": LOVABLE_API_KEY,
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: "google/gemini-3.6-flash",
         stream: true,
         messages: [{ role: "system", content: system }, ...messages],
       }),
-    });
+    }).finally(() => clearTimeout(timeout));
 
     if (!upstream.ok || !upstream.body) {
       const detail = await upstream.text();
       console.error("AI gateway error", upstream.status, detail);
-      const message =
-        upstream.status === 429
-          ? "Too many requests right now. Please try again in a moment."
-          : upstream.status === 402
-            ? "AI credits are exhausted. Please add credits to keep chatting."
-            : "The assistant is unavailable right now.";
+      const message = upstream.status === 429
+        ? "Too many requests right now. Please try again in a moment."
+        : upstream.status === 402
+          ? "AI credits are exhausted. Please add credits to keep chatting."
+          : upstream.status === 403
+            ? "AI access is blocked by workspace policy."
+            : upstream.status === 401
+              ? "AI service configuration is unavailable."
+              : "The assistant is unavailable right now.";
       return new Response(JSON.stringify({ error: message }), {
-        status: upstream.status === 429 || upstream.status === 402 ? upstream.status : 500,
+        status: [400, 401, 402, 403, 429].includes(upstream.status) || upstream.status >= 500 ? upstream.status : 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -100,8 +120,8 @@ ${context ? `\nCurrent project context the user is looking at:\n${context}` : ""
       },
     });
   } catch (error) {
-    console.error("assistant-chat error", error);
-    return new Response(JSON.stringify({ error: "Unexpected error" }), {
+    console.error("assistant-chat error", error instanceof Error ? error.name : "unknown");
+    return new Response(JSON.stringify({ error: error instanceof Error && error.message === 'Invalid message' ? error.message : "The request could not be completed safely." }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
