@@ -31,6 +31,7 @@ import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { useOfflineSync } from "@/hooks/useOfflineSync";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import SafetyNotice from "@/components/SafetyNotice";
 
 interface MyWorkspaceProps {
   language?: string;
@@ -182,6 +183,8 @@ const MyWorkspace = ({ language = "en", englishLevel = "easy" }: MyWorkspaceProp
           </p>
         )}
       </div>
+
+      <SafetyNotice />
 
       <form onSubmit={handleCreate} className="mt-6 glass rounded-lg p-5 space-y-4">
         <div className="space-y-2">

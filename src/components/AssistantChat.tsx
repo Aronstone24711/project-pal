@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Bot, Send, X, Loader2, MessageSquare, WifiOff } from "lucide-react";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { cn } from "@/lib/utils";
+import SafetyNotice from "@/components/SafetyNotice";
 
 interface ChatMessage {
   role: "user" | "assistant";
@@ -145,6 +146,7 @@ const AssistantChat = ({ language, englishLevel, context }: AssistantChatProps) 
       </header>
 
       <div ref={scrollRef} className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+        {messages.length === 0 && <SafetyNotice />}
         {messages.length === 0 && (
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
