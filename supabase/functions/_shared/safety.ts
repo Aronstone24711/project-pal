@@ -40,13 +40,10 @@ export function safeLanguage(value: unknown): string {
   return language ?? "en";
 }
 
-export function refusalResponse(decision: SafetyDecision): Response {
-  return new Response(JSON.stringify({
+export function refusalPayload(decision: SafetyDecision) {
+  return {
     refused: true,
     reason: decision.reason ?? unsafeReason,
     saferAlternative: decision.saferAlternative,
-  }), {
-    status: 422,
-    headers: { "Content-Type": "application/json" },
-  });
+  };
 }

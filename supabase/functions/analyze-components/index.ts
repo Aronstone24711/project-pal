@@ -1,8 +1,22 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkSafety, refusalPayload, safeLanguage, safeString } from "../_shared/safety.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+const jsonHeaders = { ...corsHeaders, 'Content-Type': 'application/json' };
+const allowedActions = new Set(['identify', 'suggest_projects', 'get_instructions', 'fix_code', 'board_info', 'custom_project']);
+
+const respond = (body: unknown, status = 200) =>
+  new Response(JSON.stringify(body), { status, headers: jsonHeaders });
+
+const invalid = (message: string) => respond({ error: message }, 400);
+
+const validateImage = (value: unknown) => {
+  if (typeof value !== 'string' || value.length > 6_000_000) return null;
+  return /^data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=\s]+$/.test(value) ? value : null;
 };
 
 serve(async (req) => {
@@ -11,8 +25,17 @@ serve(async (req) => {
   }
 
   try {
-    const body = await req.json();
-    const { imageBase64, action, projectId, components, language = 'en', englishLevel = 'medium' } = body;
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object' || Array.isArray(body)) return invalid('A valid request body is required.');
+
+    const action = safeString(body.action, 32);
+    if (!action || !allowedActions.has(action)) return invalid('Unsupported action.');
+
+    const imageBase64 = validateImage(body.imageBase64);
+    if (body.imageBase64 !== undefined && !imageBase64) return invalid('The image must be a supported image under 6MB.');
+
+    const language = safeLanguage(body.language);
+    const englishLevel = ['easy', 'medium', 'hard'].includes(body.englishLevel) ? body.englishLevel : 'medium';
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     
     if (!LOVABLE_API_KEY) {
@@ -22,6 +45,7 @@ serve(async (req) => {
     let messages: any[] = [];
     
     if (action === 'identify') {
+      if (!imageBase64) return invalid('An image is required.');
       // Identify ANY items from image - electronics, craft supplies, household items, anything!
       messages = [
         {
@@ -68,6 +92,21 @@ Be thorough and identify EVERYTHING you can see - paper, pencils, used pens, car
         }
       ];
     } else if (action === 'suggest_projects') {
+      if (!Array.isArray(body.components) || body.components.length < 1 || body.components.length > 100) {
+        return invalid('Provide between 1 and 100 components.');
+      }
+      const components = body.components.map((item: unknown) => {
+        if (!item || typeof item !== 'object') return null;
+        const record = item as Record<string, unknown>;
+        return {
+          name: safeString(record.name, 120),
+          type: safeString(record.type, 40),
+          quantity: typeof record.quantity === 'number' && Number.isFinite(record.quantity) ? Math.max(1, Math.min(999, Math.floor(record.quantity))) : 1,
+        };
+      });
+      if (components.some((item: { name: string | null } | null) => !item?.name)) return invalid('Each component needs a name.');
+      const safety = checkSafety(JSON.stringify(components));
+      if (safety.blocked) return respond(refusalPayload(safety), 422);
       // Suggest projects based on identified items (can be anything!)
       const languageInstruction = language !== 'en' 
         ? `IMPORTANT: Respond with all text content (name, description, tags) in ${language} language.` 
@@ -125,6 +164,10 @@ Suggest 5-8 diverse projects ranging from simple to complex. Be creative! For ad
         }
       ];
     } else if (action === 'get_instructions') {
+      const projectId = safeString(body.projectId, 500);
+      if (!projectId || !Array.isArray(body.components) || body.components.length > 100) return invalid('Project and components are required.');
+      const safety = checkSafety(`${projectId} ${JSON.stringify(body.components)}`);
+      if (safety.blocked) return respond(refusalPayload(safety), 422);
       // Get detailed instructions for a specific project (works for any type of project)
       const languageInstruction = language !== 'en' 
         ? `IMPORTANT: Respond with all text content (name, overview, descriptions, tips, explanations, testing steps, troubleshooting) in ${language} language. Keep technical terms like pin names and code in English if applicable.` 
@@ -226,7 +269,13 @@ IMPORTANT: Every connection in "connections" array must have SPECIFIC, REAL pin 
       ];
     } else if (action === 'fix_code') {
       // Fix code based on user's problem description
-      const { currentCode, problemDescription, deviceType, language: lang = 'en' } = body;
+      const currentCode = safeString(body.currentCode, 30_000);
+      const problemDescription = safeString(body.problemDescription, 3_000);
+      const deviceType = safeString(body.deviceType, 80);
+      const lang = safeLanguage(body.language);
+      if (!currentCode || !problemDescription || !deviceType) return invalid('Code, device, and problem description are required.');
+      const safety = checkSafety(`${problemDescription}\n${currentCode}`);
+      if (safety.blocked) return respond(refusalPayload(safety), 422);
       
       const languageInstruction = lang !== 'en' 
         ? `IMPORTANT: Respond with all text content (analysis, explanation, tips) in ${lang} language. Keep code and technical terms in English.` 
@@ -279,6 +328,10 @@ Please analyze and fix the code.`
       ];
     } else if (action === 'board_info') {
       const { boardName, language: lang = 'en' } = body;
+      const safeBoardName = safeString(boardName, 120);
+      if (!safeBoardName) return invalid('Board name is required.');
+      const safeBoardSafety = checkSafety(safeBoardName);
+      if (safeBoardSafety.blocked) return respond(refusalPayload(safeBoardSafety), 422);
       const languageInstruction = lang !== 'en'
         ? `Write all descriptive text in ${lang} language. Keep pin names, board names and technical identifiers in English.`
         : '';
@@ -307,12 +360,20 @@ Return JSON with this exact structure:
         },
         {
           role: "user",
-          content: `Board: ${boardName}. Provide accurate specifications.`
+          content: `Board: ${safeBoardName}. Provide accurate specifications.`
         }
       ];
     } else if (action === 'custom_project') {
       // User's own idea -> full personalised build plan
-      const { idea, device, ownComponents, language: lang = 'en', englishLevel: level = 'easy', imageBase64: ideaImage } = body;
+      const idea = safeString(body.idea, 4_000);
+      const device = safeString(body.device, 120) ?? '';
+      const ownComponents = safeString(body.ownComponents, 2_000) ?? '';
+      const lang = safeLanguage(body.language);
+      const level = ['easy', 'medium', 'hard'].includes(body.englishLevel) ? body.englishLevel : 'easy';
+      const ideaImage = imageBase64;
+      if (!idea) return invalid('A project idea is required.');
+      const safety = checkSafety(`${idea}\n${device}\n${ownComponents}`);
+      if (safety.blocked) return respond(refusalPayload(safety), 422);
 
       const languageInstruction = lang !== 'en'
         ? `Respond with all text in ${lang} language. Keep code, pin names and library names in English.`
@@ -381,20 +442,24 @@ Return JSON with this exact structure:
       ];
     }
 
+    if (messages.length === 0) return invalid('The request could not be prepared.');
     console.log(`Processing ${action} request...`);
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 55_000);
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Lovable-API-Key": LOVABLE_API_KEY,
         "Content-Type": "application/json",
       },
+      signal: controller.signal,
       body: JSON.stringify({
         model: "google/gemini-2.5-pro",
         messages,
         response_format: { type: "json_object" }
       }),
-    });
+    }).finally(() => clearTimeout(timeout));
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -410,8 +475,8 @@ Return JSON with this exact structure:
         });
       }
       const errorText = await response.text();
-      console.error("AI gateway error:", response.status, errorText);
-      throw new Error(`AI gateway error: ${response.status}`);
+      console.error("AI gateway error:", response.status);
+      return respond({ error: response.status === 403 ? "AI access is blocked by workspace policy." : response.status === 401 ? "AI service configuration is unavailable." : "The AI service is unavailable right now." }, response.status);
     }
 
     const data = await response.json();
@@ -426,16 +491,11 @@ Return JSON with this exact structure:
       result = { raw: content };
     }
 
-    return new Response(JSON.stringify(result), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond(result);
 
   } catch (error) {
     console.error("Error in analyze-components:", error);
     const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-    return new Response(JSON.stringify({ error: errorMessage }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return respond({ error: errorMessage.includes('aborted') ? 'The request took too long. Please try again with a smaller request.' : 'The request could not be completed safely.' }, 500);
   }
 });
