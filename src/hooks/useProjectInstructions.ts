@@ -22,6 +22,7 @@ export const useProjectInstructions = ({ project, components, language, englishL
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [fromCache, setFromCache] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { toast } = useToast();
 
   const load = useCallback(async () => {
@@ -47,6 +48,7 @@ export const useProjectInstructions = ({ project, components, language, englishL
     }
 
     setIsLoading(true);
+    setErrorMessage(null);
     try {
       const { data, error } = await supabase.functions.invoke("analyze-components", {
         body: {
@@ -60,17 +62,25 @@ export const useProjectInstructions = ({ project, components, language, englishL
 
       if (error) throw error;
 
-      if (data?.project) {
-        setInstructions(data);
-        setCode(data.project.code?.code || "");
-        setFromCache(false);
-        writeCachedInstructions(cacheKey, data);
+      if (data?.refused) {
+        throw new Error(data.reason || "This project cannot be generated safely.");
       }
+      if (!data?.project) throw new Error("The instruction response was empty. Please try again.");
+
+      setInstructions(data);
+      setCode(data.project.code?.code || "");
+      setFromCache(false);
+      writeCachedInstructions(cacheKey, data);
     } catch (error: any) {
-      if (cached) return;
+      if (cached) {
+        setErrorMessage(null);
+        return;
+      }
+      const message = error?.message || "Please try again.";
+      setErrorMessage(message);
       toast({
         title: "Failed to Load Instructions",
-        description: error?.message || "Please try again.",
+        description: message,
         variant: "destructive",
       });
     } finally {
@@ -93,5 +103,5 @@ export const useProjectInstructions = ({ project, components, language, englishL
     );
   }, []);
 
-  return { instructions, code, isLoading, fromCache, reload: load, applyFixedCode };
+  return { instructions, code, isLoading, fromCache, errorMessage, reload: load, applyFixedCode };
 };

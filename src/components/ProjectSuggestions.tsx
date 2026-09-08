@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, Clock, Loader2, Sparkles, ChevronRight } from "lucide-react";
+import { ArrowLeft, Clock, Loader2, Sparkles, ChevronRight, Play } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Component, Project } from "@/types/arduino";
@@ -110,7 +110,7 @@ const ProjectSuggestions = ({
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
           {projects.map((project) => (
-            <Card 
+            <Card
               key={project.id}
               className="cursor-pointer hover:border-primary transition-all hover:shadow-lg group"
               onClick={() => onProjectSelect(project)}
@@ -145,6 +145,17 @@ const ProjectSuggestions = ({
                     {project.componentsUsed.length > 3 && ` +${project.componentsUsed.length - 3} more`}
                   </p>
                 </div>
+                <Button
+                  type="button"
+                  className="mt-4 w-full gap-2"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onProjectSelect(project);
+                  }}
+                >
+                  <Play className="w-4 h-4" />
+                  Start project
+                </Button>
               </CardContent>
             </Card>
           ))}
