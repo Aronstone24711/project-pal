@@ -25,7 +25,7 @@ interface ProjectInstructionsProps {
 
 const ProjectInstructions = ({ project, components, onBack, language, englishLevel }: ProjectInstructionsProps) => {
   const online = useOnlineStatus();
-  const { instructions, code, isLoading, fromCache, reload, applyFixedCode } = useProjectInstructions({
+  const { instructions, code, isLoading, fromCache, errorMessage, reload, applyFixedCode } = useProjectInstructions({
     project,
     components,
     language,
@@ -66,7 +66,10 @@ const ProjectInstructions = ({ project, components, onBack, language, englishLev
       <div className="max-w-4xl mx-auto">
         <Card>
           <CardContent className="py-16 text-center">
-            <p className="text-muted-foreground">Failed to load instructions.</p>
+            <p className="font-medium text-foreground">We could not start this project.</p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {errorMessage || "The instruction response was empty. Please try again."}
+            </p>
             <Button onClick={reload} className="mt-4">Try Again</Button>
           </CardContent>
         </Card>
