@@ -165,8 +165,24 @@ Suggest 5-8 diverse projects ranging from simple to complex. Be creative! For ad
       ];
     } else if (action === 'get_instructions') {
       const projectId = safeString(body.projectId, 500);
-      if (!projectId || !Array.isArray(body.components) || body.components.length > 100) return invalid('Project and components are required.');
-      const safety = checkSafety(`${projectId} ${JSON.stringify(body.components)}`);
+      if (!projectId || !Array.isArray(body.components) || body.components.length < 1 || body.components.length > 100) {
+        return invalid('Project and components are required.');
+      }
+      const components = body.components.map((item: unknown) => {
+        if (!item || typeof item !== 'object') return null;
+        const record = item as Record<string, unknown>;
+        return {
+          name: safeString(record.name, 120),
+          type: safeString(record.type, 40),
+          quantity: typeof record.quantity === 'number' && Number.isFinite(record.quantity)
+            ? Math.max(1, Math.min(999, Math.floor(record.quantity)))
+            : 1,
+        };
+      });
+      if (components.some((item: { name: string | null } | null) => !item?.name)) {
+        return invalid('Each component needs a name.');
+      }
+      const safety = checkSafety(`${projectId} ${JSON.stringify(components)}`);
       if (safety.blocked) return respond(refusalPayload(safety), 422);
       // Get detailed instructions for a specific project (works for any type of project)
       const languageInstruction = language !== 'en' 
