@@ -7,6 +7,9 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Component, Project } from "@/types/arduino";
 import { EnglishLevel } from "./EnglishLevelSelector";
+import projectNightLamp from "@/assets/project-night-lamp.jpg";
+import projectPlantMonitor from "@/assets/project-plant-monitor.jpg";
+import projectRover from "@/assets/project-rover.jpg";
 
 interface ProjectSuggestionsProps {
   components: Component[];
@@ -19,9 +22,16 @@ interface ProjectSuggestionsProps {
 }
 
 const difficultyColors = {
-  beginner: "bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20",
-  intermediate: "bg-yellow-500/10 text-yellow-600 dark:text-yellow-400 border-yellow-500/20",
-  advanced: "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+  beginner: "bg-primary/10 text-primary border-primary/20",
+  intermediate: "bg-accent/10 text-accent-foreground border-accent/20",
+  advanced: "bg-destructive/10 text-destructive border-destructive/20",
+};
+
+const projectImage = (project: Project) => {
+  const text = `${project.name} ${project.tags?.join(" ") || ""}`.toLowerCase();
+  if (text.includes("plant") || text.includes("moisture")) return projectPlantMonitor;
+  if (text.includes("rover") || text.includes("robot") || project.difficulty === "advanced") return projectRover;
+  return projectNightLamp;
 };
 
 const ProjectSuggestions = ({ 
@@ -115,6 +125,7 @@ const ProjectSuggestions = ({
               className="cursor-pointer hover:border-primary transition-all hover:shadow-lg group"
               onClick={() => onProjectSelect(project)}
             >
+              <img src={projectImage(project)} alt={`${project.name} project example`} width={1024} height={1024} loading="lazy" className="aspect-[16/9] w-full object-cover rounded-t-lg" />
               <CardHeader className="pb-3">
                 <div className="flex items-start justify-between gap-2">
                   <CardTitle className="text-lg leading-tight">{project.name}</CardTitle>
@@ -133,7 +144,7 @@ const ProjectSuggestions = ({
               <CardContent>
                 <p className="text-sm text-muted-foreground mb-3">{project.description}</p>
                 <div className="flex flex-wrap gap-1">
-                  {project.tags.map((tag, idx) => (
+                  {(project.tags || []).map((tag, idx) => (
                     <Badge key={idx} variant="outline" className="text-xs">
                       {tag}
                     </Badge>
@@ -141,8 +152,8 @@ const ProjectSuggestions = ({
                 </div>
                 <div className="mt-3 pt-3 border-t border-border">
                   <p className="text-xs text-muted-foreground">
-                    Uses: {project.componentsUsed.slice(0, 3).join(", ")}
-                    {project.componentsUsed.length > 3 && ` +${project.componentsUsed.length - 3} more`}
+                     Uses: {(project.componentsUsed || []).slice(0, 3).join(", ") || "Your scanned parts"}
+                     {(project.componentsUsed || []).length > 3 && ` +${project.componentsUsed.length - 3} more`}
                   </p>
                 </div>
                 <Button

@@ -13,6 +13,7 @@ export interface Project {
   estimatedTime: string;
   componentsUsed: string[];
   tags: string[];
+  image?: string;
 }
 
 export interface Connection {
