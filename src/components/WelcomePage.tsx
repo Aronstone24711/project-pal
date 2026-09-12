@@ -7,6 +7,9 @@ import AddBoardDialog from "@/components/AddBoardDialog";
 import HowItWorks from "@/components/home/HowItWorks";
 import FeatureGrid from "@/components/home/FeatureGrid";
 import HomeFaq from "@/components/home/HomeFaq";
+import FeaturedProjects from "@/components/FeaturedProjects";
+import LearningTracks from "@/components/LearningTracks";
+import BuildJournal from "@/components/BuildJournal";
 import { useCustomBoards } from "@/hooks/useCustomBoards";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
@@ -125,9 +128,15 @@ const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "eas
 
       <HowItWorks />
 
+      <FeaturedProjects onStart={onContinue} />
+
+      <LearningTracks />
+
       <FeatureGrid />
 
       <MyWorkspace language={language} englishLevel={englishLevel} />
+
+      <BuildJournal />
 
       <HomeFaq />
 
