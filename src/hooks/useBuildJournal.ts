@@ -48,7 +48,9 @@ export const useBuildJournal = () => {
   useEffect(() => {
     listeners.add(setPosts);
     setPosts(postsStore);
-    return () => listeners.delete(setPosts);
+    return () => {
+      listeners.delete(setPosts);
+    };
   }, []);
 
   const addPost = useCallback((post: Omit<BuildJournalPost, "id" | "createdAt">) => {
