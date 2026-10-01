@@ -1,22 +1,23 @@
+# Electronics Knowledge Assistant
 
+Add a built-in "Board Knowledge" section that explains microcontroller boards (starting with Arduino Uno) in a structured, beginner-friendly way — pin functions, basic components, and practical examples — without needing the AI service, so it also works offline.
 
-# Plan: Replace Logo with Uploaded Image + Weather-Adaptive Background
+## What you'll see
 
-## What Changes
+- A new **"Know your board"** section on the home page, below the lessons.
+- A board picker (Arduino Uno, ESP32, Raspberry Pi, plus any custom boards the user added).
+- For each board, three beginner-friendly tabs:
+  1. **Pins explained** — every pin group (power, digital, analog, communication) in plain language, with what each one is for and a caution where needed (e.g. "3.3V only").
+  2. **Basic components** — LED, resistor, button, sensor, buzzer: what they do, how to identify legs/polarity, and how they connect to the board.
+  3. **Try it examples** — 2–3 tiny practical examples per board (e.g. blink an LED, read a button) with a short wiring list and a minimal code snippet matching the app's instruction style.
+- Language level selector (easy/medium/hard) already chosen by the user adjusts the wording: easy = very simple words, hard = datasheet-style terms.
+- A "Ask Pal about this board" button that opens the existing side assistant with the board's context pre-filled, for follow-up questions.
 
-1. **Copy the uploaded logo** (`searchall-logo.png`) into `src/assets/` so it can be imported in React components.
+## Technical details
 
-2. **Update the header logo** (Index.tsx, line 145-149): Replace the SVG icon with the uploaded logo image. Remove the colored background box and render the image directly.
-
-3. **Update the WelcomePage logo** (WelcomePage.tsx, line 11-15): Replace the SVG icon with the uploaded logo image, sized larger for the welcome screen.
-
-4. **Make the logo background weather-adaptive**: The logo image has a light/white background. Wrap it in a container that uses CSS classes tied to the current weather theme (these already exist via `.theme-*` classes on `:root`). The container will use `bg-background` and `rounded-2xl` so it blends with whatever weather theme is active — sunny gets warm tones, night gets dark tones, rainy gets cool blues, etc. The image itself will have a transparent-friendly treatment using `mix-blend-mode: multiply` so the white background of the PNG blends into the themed container color.
-
-## Technical Details
-
-- **Files modified**: `src/pages/Index.tsx`, `src/components/WelcomePage.tsx`
-- **File copied**: `user-uploads://searchall-logo.png` → `src/assets/searchall-logo.png`
-- Import the image as an ES module: `import searchAllLogo from "@/assets/searchall-logo.png"`
-- The logo container will use existing theme CSS variables (`bg-card`, `bg-background`) which already change per weather theme, so no new CSS is needed
-- The tagline "PLACE WHERE IDEAS MEET INNOVATION" from the image can optionally replace "Scan • Discover • Create" in the header subtitle
-
+- New static data module `src/data/boardKnowledge.ts` with typed entries: pin groups, components, and examples per board — no network needed, fully offline.
+- New component `src/components/BoardKnowledge.tsx` (tabs via existing shadcn `Tabs`, semantic colors only, matches the terminal/glass design).
+- Rendered in `WelcomePage.tsx` between `LearningTracks` and `FeatureGrid`.
+- Wording variants per `englishLevel` stored in the data module; the existing `englishLevel` prop is passed down.
+- "Ask Pal" reuses `AssistantChat` by passing the board summary as `context`.
+- No backend changes; no new dependencies. Verify with a production build and a browser check of the new section.
