@@ -13,6 +13,15 @@ interface BoardKnowledgeProps {
   onAskPal: (question: string, context: string) => void;
 }
 
+const nextCommonResistance = (minimum: number) => {
+  const values = [10, 12, 15, 18, 22, 27, 33, 39, 47, 56, 68, 82];
+  for (let decade = 0.1; decade <= 1_000_000; decade *= 10) {
+    const match = values.map((value) => value * decade).find((value) => value >= minimum);
+    if (match) return match;
+  }
+  return null;
+};
+
 const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnowledgeProps) => {
   const options = useMemo(() => [
     ...Object.entries(boardKnowledge).map(([key, board]) => ({ value: key, label: board.label })),
@@ -47,6 +56,7 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
     const amps = Number(current) / 1000;
     return Number.isFinite(volts) && Number.isFinite(amps) && volts > 0 && amps > 0 ? Math.ceil(volts / amps) : null;
   })();
+  const commonResistance = requiredResistance ? nextCommonResistance(requiredResistance) : null;
   const context = `${board.label} reference: ${board.overview}\nPin notes: ${board.pins.map((pin) => `${pin.group} (${pin.pins}): ${pin.purpose} ${pin.caution || ""}`).join("; ")}\nSafety: confirm the board pinout and voltage before wiring.`;
 
   return (
@@ -61,8 +71,8 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
         <div className="flex items-center gap-3">
           <Cpu className="h-5 w-5 text-primary" />
           <Select value={selected} onValueChange={setSelected}>
-            <SelectTrigger className="w-full sm:w-72" aria-label="Choose a board"><SelectValue /></SelectTrigger>
-            <SelectContent>{options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+          <SelectTrigger className="w-full sm:w-72" aria-label="Choose a board"><SelectValue /></SelectTrigger>
+          <SelectContent>{options.map((option) => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
           </Select>
         </div>
         <Button variant="outline" className="gap-2" onClick={() => onAskPal(`Explain ${board.label} pins and help me safely connect a resistor and LED.`, context)}>
