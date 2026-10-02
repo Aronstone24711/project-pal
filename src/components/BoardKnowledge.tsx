@@ -32,7 +32,13 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
           { group: "Logic voltage", pins: customBoard.details?.logicVoltage || "Not specified", purpose: "Check voltage compatibility before connecting any signal." },
           { group: "Communication", pins: customBoard.details?.communication?.join(", ") || "Not specified", purpose: "Confirm the pin assignments in the board documentation." },
         ],
-        components: boardKnowledge.Arduino.components,
+        components: [
+          { name: "Resistor", job: "Limits current or sets signal levels; it has no polarity.", use: "For an LED, calculate (board logic voltage − LED forward voltage) ÷ desired current, then choose the next higher common resistor value.", caution: `This board's safe logic voltage is ${customBoard.details?.logicVoltage || "unknown"}. Confirm its pinout and limits before wiring.` },
+          { name: "LED", job: "Emits light when current flows in one direction.", use: "Long leg is usually anode; short leg / flat edge is usually cathode. Always add a series resistor." },
+          { name: "Push button", job: "Creates a human-operated input.", use: "Connect to a documented input and a valid logic level; check whether the board provides an internal pull-up." },
+          { name: "Sensor", job: "Measures a physical value.", use: "Check supply voltage, output voltage, and interface against the board specifications." },
+          { name: "Buzzer", job: "Makes a tone or alert.", use: "Check its voltage and current; use a driver if it exceeds the board pin rating." },
+        ],
         examples: [{ title: "Start safely", parts: [customBoard.name, "Board pinout or manual"], wiring: ["Identify a documented GPIO pin and GND", "Check operating voltage and pin current limits before attaching a component."], note: "Custom board-specific example code is not generated from saved board details." }],
       }
     : boardKnowledge[selected] || boardKnowledge.Arduino;
@@ -48,7 +54,7 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
       <div className="border-b border-border/60 pb-4">
         <p className="terminal-label">// board field guide</p>
         <h2 id="board-knowledge-title" className="mt-2 text-2xl font-bold md:text-3xl">Know your board</h2>
-        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{englishLevel === "hard" ? "Pin reference, component behavior, and practical circuit examples." : "Clear board guides, simple part help, and safe first examples."}</p>
+        <p className="mt-2 max-w-2xl text-sm text-muted-foreground">{englishLevel === "hard" ? "Pin reference, component behavior, and practical circuit examples." : englishLevel === "medium" ? "Plain-language pin functions, components, and practical examples." : "Simple words explain what pins and parts do, with safe steps to try."}</p>
       </div>
 
       <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
