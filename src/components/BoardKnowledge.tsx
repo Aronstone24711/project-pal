@@ -117,7 +117,7 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
               <label className="text-xs text-muted-foreground">LED voltage (V)<Input aria-label="LED voltage" type="number" min="0" step="0.1" value={ledDrop} onChange={(event) => setLedDrop(event.target.value)} className="mt-1" /></label>
               <label className="text-xs text-muted-foreground">LED current (mA)<Input aria-label="LED current" type="number" min="0.1" step="1" value={current} onChange={(event) => setCurrent(event.target.value)} className="mt-1" /></label>
             </div>
-            <p className="mt-3 text-sm font-medium" aria-live="polite">{requiredResistance ? `Estimate: ${requiredResistance}Ω or the next higher common value (for example ${requiredResistance <= 220 ? "220Ω or 330Ω" : requiredResistance <= 330 ? "330Ω" : "a suitable standard value above this estimate"}).` : "Enter valid values with supply voltage higher than LED voltage."}</p>
+            <p className="mt-3 text-sm font-medium" aria-live="polite">{requiredResistance && commonResistance ? `Estimate: ${requiredResistance}Ω minimum; try ${commonResistance}Ω (next higher common value).` : "Enter valid values with supply voltage higher than LED voltage."}</p>
             <p className="mt-1 text-xs text-muted-foreground">This is an estimate, not a substitute for checking the LED datasheet and the board's pin-current limit. A resistor has no polarity; put it in series with the LED.</p>
 
             <details className="mt-4">
