@@ -10,6 +10,7 @@ import HomeFaq from "@/components/home/HomeFaq";
 import FeaturedProjects from "@/components/FeaturedProjects";
 import LearningTracks from "@/components/LearningTracks";
 import BuildJournal from "@/components/BuildJournal";
+import BoardKnowledge from "@/components/BoardKnowledge";
 import { useCustomBoards } from "@/hooks/useCustomBoards";
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 
@@ -18,11 +19,12 @@ interface WelcomePageProps {
   onDebug: () => void;
   language?: string;
   englishLevel?: string;
+  onAskPal: (question: string, context: string) => void;
 }
 
 const boards = ["Arduino", "ESP32", "Raspberry Pi", "STM32"];
 
-const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "easy" }: WelcomePageProps) => {
+const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "easy", onAskPal }: WelcomePageProps) => {
   const { boards: customBoards, removeBoard } = useCustomBoards();
   const online = useOnlineStatus();
   const [addBoardOpen, setAddBoardOpen] = useState(false);
@@ -131,6 +133,8 @@ const WelcomePage = ({ onContinue, onDebug, language = "en", englishLevel = "eas
       <FeaturedProjects onStart={onContinue} />
 
       <LearningTracks />
+
+      <BoardKnowledge englishLevel={englishLevel} customBoards={customBoards} onAskPal={onAskPal} />
 
       <FeatureGrid />
 

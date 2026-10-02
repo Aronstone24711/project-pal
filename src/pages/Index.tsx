@@ -51,6 +51,7 @@ const Index = () => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const { weatherData } = useTheme();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [assistantLaunchRequest, setAssistantLaunchRequest] = useState<{ id: number; prompt: string; context: string } | null>(null);
 
   useDocumentHead(
     "Search All | Scan Items & Discover Projects",
@@ -63,6 +64,10 @@ const Index = () => {
 
   const handleDebugClick = () => {
     setState("debug");
+  };
+
+  const handleAskPal = (prompt: string, context: string) => {
+    setAssistantLaunchRequest({ id: Date.now(), prompt, context });
   };
 
   const handleLocationSet = () => {
@@ -218,6 +223,7 @@ const Index = () => {
               onDebug={handleDebugClick}
               language={language?.code || "en"}
               englishLevel={englishLevel}
+              onAskPal={handleAskPal}
             />
           )}
 
@@ -284,6 +290,7 @@ const Index = () => {
         <AssistantChat
           language={language?.code || "en"}
           englishLevel={englishLevel}
+          launchRequest={assistantLaunchRequest}
           context={
             selectedProject
               ? `Project: ${selectedProject.name} — ${selectedProject.description}. Parts available: ${components
