@@ -69,7 +69,7 @@ export const boardKnowledge: Record<string, BoardKnowledgeEntry> = {
     ],
     examples: [
       { title: "Blink an LED with Python", parts: ["40-pin Raspberry Pi", "LED", "330Ω resistor"], wiring: ["BCM GPIO17 (physical pin 11) → 330Ω resistor → LED long leg", "LED short leg → a GND pin (for example, physical pin 6)"], code: "from gpiozero import LED\nfrom time import sleep\n\nled = LED(17)  # BCM numbering\nwhile True:\n    led.on()\n    sleep(0.5)\n    led.off()\n    sleep(0.5)", note: "This example uses the gpiozero library. Confirm your model has a 40-pin header and use BCM numbering in code." },
-      { title: "Read a button with Python", parts: ["Raspberry Pi", "push button", "jumper wires"], wiring: ["Button between BCM GPIO2? No — choose a free GPIO such as BCM GPIO27 and GND", "The example enables a software pull-up."], code: "from gpiozero import Button\nfrom signal import pause\n\nbutton = Button(27, pull_up=True)\nbutton.when_pressed = lambda: print(\"Pressed\")\nbutton.when_released = lambda: print(\"Released\")\npause()", note: "Use BCM GPIO numbering in code. Avoid pins used by I²C, SPI, or your other hardware." },
+      { title: "Read a button with Python", parts: ["Raspberry Pi", "push button", "jumper wires"], wiring: ["Button between BCM GPIO27 (physical pin 13) and GND", "The example enables a software pull-up."], code: "from gpiozero import Button\nfrom signal import pause\n\nbutton = Button(27, pull_up=True)\nbutton.when_pressed = lambda: print(\"Pressed\")\nbutton.when_released = lambda: print(\"Released\")\npause()", note: "Use BCM GPIO numbering in code. Avoid pins used by I²C, SPI, or your other hardware." },
     ],
   },
   STM32: {

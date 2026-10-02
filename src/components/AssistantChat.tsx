@@ -16,6 +16,7 @@ interface AssistantChatProps {
   language: string;
   englishLevel: string;
   context?: string;
+  launchRequest?: { id: number; prompt: string; context: string } | null;
 }
 
 const ENDPOINT = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/assistant-chat`;
@@ -26,18 +27,26 @@ const SUGGESTIONS = [
   "Draw the wiring for a servo on ESP32",
 ];
 
-const AssistantChat = ({ language, englishLevel, context }: AssistantChatProps) => {
+const AssistantChat = ({ language, englishLevel, context, launchRequest }: AssistantChatProps) => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [launchContext, setLaunchContext] = useState<string | undefined>();
   const online = useOnlineStatus();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, open]);
+
+  useEffect(() => {
+    if (!launchRequest) return;
+    setLaunchContext(launchRequest.context);
+    setInput(launchRequest.prompt);
+    setOpen(true);
+  }, [launchRequest]);
 
   const send = async (text: string) => {
     const question = text.trim();
@@ -55,7 +64,7 @@ const AssistantChat = ({ language, englishLevel, context }: AssistantChatProps) 
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: history, language, englishLevel, context }),
+        body: JSON.stringify({ messages: history, language, englishLevel, context: launchContext || context }),
       });
 
       if (!res.ok || !res.body) {
