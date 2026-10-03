@@ -5,4 +5,4 @@
 - [x] Add pictured project examples and start actions
 - [x] Add beginner and expert electronics lessons
 - [x] Add photo-based maker journal posts
-- [ ] Add offline board knowledge guide with practical resistor assistance
+- [x] Add offline board knowledge guide with practical resistor assistance
