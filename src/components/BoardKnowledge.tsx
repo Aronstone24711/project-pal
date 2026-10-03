@@ -113,9 +113,9 @@ const BoardKnowledge = ({ englishLevel, customBoards = [], onAskPal }: BoardKnow
             <div className="flex items-center gap-2"><Calculator className="h-4 w-4 text-primary" /><h3 className="font-semibold">LED resistor helper</h3></div>
             <p className="mt-1 text-sm text-muted-foreground">Estimate a series resistor: (supply voltage − LED voltage) ÷ current in amps.</p>
             <div className="mt-4 grid gap-3 sm:grid-cols-3">
-              <label className="text-xs text-muted-foreground">Supply voltage (V)<Input aria-label="Supply voltage" type="number" min="0.1" step="0.1" value={supply} onChange={(event) => setSupply(event.target.value)} className="mt-1" /></label>
-              <label className="text-xs text-muted-foreground">LED voltage (V)<Input aria-label="LED voltage" type="number" min="0" step="0.1" value={ledDrop} onChange={(event) => setLedDrop(event.target.value)} className="mt-1" /></label>
-              <label className="text-xs text-muted-foreground">LED current (mA)<Input aria-label="LED current" type="number" min="0.1" step="1" value={current} onChange={(event) => setCurrent(event.target.value)} className="mt-1" /></label>
+              <label className="text-xs text-muted-foreground">Supply voltage (V)<Input aria-label="Supply voltage in volts" type="number" min="0.1" step="0.1" value={supply} onChange={(event) => setSupply(event.target.value)} className="mt-1" /></label>
+              <label className="text-xs text-muted-foreground">LED voltage (V)<Input aria-label="LED voltage in volts" type="number" min="0" step="0.1" value={ledDrop} onChange={(event) => setLedDrop(event.target.value)} className="mt-1" /></label>
+              <label className="text-xs text-muted-foreground">LED current (mA)<Input aria-label="LED current in milliamps" type="number" min="0.1" step="1" value={current} onChange={(event) => setCurrent(event.target.value)} className="mt-1" /></label>
             </div>
             <p className="mt-3 text-sm font-medium" aria-live="polite">{requiredResistance && commonResistance ? `Estimate: ${requiredResistance}Ω minimum; try ${commonResistance}Ω (next higher common value).` : "Enter valid values with supply voltage higher than LED voltage."}</p>
             <p className="mt-1 text-xs text-muted-foreground">This is an estimate, not a substitute for checking the LED datasheet and the board's pin-current limit. A resistor has no polarity; put it in series with the LED.</p>
